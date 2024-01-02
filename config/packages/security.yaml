@@ -1,17 +1,53 @@
+framework:
+    rate_limiter:
+        username_ip_login:
+            policy: token_bucket
+            limit: 5
+            rate: { interval: '5 minutes' }
+        ip_login:
+            policy: sliding_window
+            limit: 10
+            interval: '15 minutes'
+        
+services:
+    app.login_rate_limiter:
+        class: Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter
+        arguments:
+            $globalFactory: '@limiter.ip_login'
+            $localFactory: '@limiter.username_ip_login'
+            $secret: '%kernel.secret%'
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+        # used to reload user from session & other features (e.g. switch_user)
+    role_hierarchy:
+        ROLE_USER: ROLE_USER
+        ROLE_ADMIN: ROLE_ADMIN
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            login_throttling:
+                limiter: app.login_rate_limiter
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: /
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -22,8 +58,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

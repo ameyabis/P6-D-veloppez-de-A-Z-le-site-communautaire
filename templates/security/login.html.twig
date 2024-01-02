@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SnowTrick - Connexion{% endblock %}
+
+{% block body %}
+<section class="vh-100">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-10">
+                <div class="card rounded-4">
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-lg-block">
+                            <img src="https://images.photowall.com/products/48586/snowboard-grab.jpg?h=699&q=85"
+                                alt="login form" class="img-fluid h-100 rounded-start-4" />
+                        </div>
+
+                        <div class="col-md-12 col-lg-7 d-flex align-items-center">
+                            <div class="card-body p-4 p-lg-5 text-black">
+                                <form method="post">
+                                    {% if error %}
+                                    <div class="alert alert-danger">
+                                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="d-flex justify-content-center mb-3 pb-1">
+                                        <img src="https://img.freepik.com/vecteurs-premium/logo-snowboard_25327-271.jpg?w=2000"
+                                            alt="" class="img-fluid w-25">
+                                    </div>
+
+                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">
+                                        Veuillez-vous connecter à votre compte
+                                    </h5>
+
+                                    <div class="form-outline mb-4">
+                                        <label class="form-label" for="username">Username</label>
+                                        <input type="text" value="{{ last_username }}" name="_username" id="username"
+                                            class="form-control" autocomplete="username" required autofocus>
+                                    </div>
+
+                                    <div class="form-outline mb-4">
+                                        <label class="form-label" for="password">Mot de passe</label>
+                                        <input type="password" name="_password" id="password" class="form-control"
+                                            autocomplete="current-password" required>
+                                    </div>
+
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                                    <div class="pt-1 mb-4">
+                                        <button class="btn btn-dark btn-lg btn-block" type="submit">
+                                            Connexion
+                                        </button>
+                                    </div>
+
+                                    <p class="mb-5 pb-lg-2" style="color: #000;">Tu n'as pas de compte ?
+                                        <a href="{{ path('app_register') }}" style="color: #393f81;">Inscris-toi ici</a>
+                                    </p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+{% endblock %}
