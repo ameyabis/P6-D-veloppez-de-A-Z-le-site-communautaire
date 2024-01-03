@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HomeController!{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <section class="vh-100 d-flex justify-content-center">
+        <div class="col position-absolute">
+            <div class="position-absolute top-50 start-50 translate-middle" style="color: #F8F9FA;">
+                <h1>Bienvenue sur SnowTricks !</h1>
+                <span>N'éhistez pas à partager & discuter avec tout le monde.</span>
+            </div>
+            <img class="col-12 object-fit-cover"
+                src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg" alt="image de bord">
+        </div>
+    </section>
+
+    <section class="container-fluid">
+        <h1>Tricks</h1>
+        <div class="col d-flex flex-wrap justify-content-center">
+            <div class="card col-12 col-lg-3 m-2">
+                <a href="#" class="text-dark text-decoration-none">
+                    <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
+                        class="card-img-top" alt="...">
+                    <div class="col-12 d-flex align-items-center">
+                        <h2 class="col-10">Title trick</h2>
+                        <i class="col-1 fa-solid fa-pen"></i>
+                        <i class="col-1 fa-solid fa-trash"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div class="card col-12 col-lg-3 m-2">
+                <a href="#" class="text-dark text-decoration-none">
+                    <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
+                        class="card-img-top" alt="...">
+                    <div class="col-12 d-flex align-items-center">
+                        <h2 class="col-10">Title trick</h2>
+                        <i class="col-1 fa-solid fa-pen"></i>
+                        <i class="col-1 fa-solid fa-trash"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div class="card col-12 col-lg-3 m-2">
+                <a href="#" class="text-dark text-decoration-none">
+                    <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
+                        class="card-img-top" alt="...">
+                    <div class="col-12 d-flex align-items-center">
+                        <h2 class="col-10">Title trick</h2>
+                        <i class="col-1 fa-solid fa-pen"></i>
+                        <i class="col-1 fa-solid fa-trash"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
