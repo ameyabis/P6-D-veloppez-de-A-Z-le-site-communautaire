@@ -24,9 +24,11 @@
 </head>
 
 <body>
+    {% block header %}
     {% include "layout/header.html.twig" %}
+    {% endblock header %}
     {% block body %}{% endblock %}
-    {% block footer %}{% endblock footer %}
+    {% include "layout/footer.html.twig" %}
 </body>
 
 </html>
