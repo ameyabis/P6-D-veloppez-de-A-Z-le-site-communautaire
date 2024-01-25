@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class TrickController extends AbstractController
 {
@@ -21,7 +22,7 @@ class TrickController extends AbstractController
     #[Route(path: '/formTrick', name: 'form_trick')]
     public function createFormTrick(
         Request $request,
-        User $user
+    #[CurrentUser] ?User $user
     ): Response {
         $trick = new Trick();
         $dateNow = new \DateTime();
@@ -37,25 +38,25 @@ class TrickController extends AbstractController
             $trick->setGroupTrick($completedForm['groupTrick']);
             $trick->setDescription($completedForm['description']);
             $trick->setDateCreate($dateNow);
-            // $trick->setUser();
-            $user->getId();
-            dd($user);
+            $trick->setUser($user);
 
             $this->em->persist($trick);
-            if ($this->em->flush()) {
-                return $this->render('home/homePage.html.twig');
-            }
-        }
+            $this->em->flush();
 
-        return $this->render('crud/formCreateTrick.html.twig', [
-            'formTrick' => $formTrick,
-        ]);
+            return $this->render('home/homePage.html.twig', [
+                'tricks' => $this->getTricks()
+            ]);
+        } else {
+            return $this->render('crud/formCreateTrick.html.twig', [
+                'formTrick' => $formTrick,
+            ]);
+        }
     }
 
     #[Route(path: '/trick/{id}', name: 'one_trick')]
     public function showOneTrick(int $id): Response
     {
-        $trick = $this->getTrick($id);
+        $trick = $this->em->getRepository(Trick::class)->find($id);
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
@@ -69,22 +70,10 @@ class TrickController extends AbstractController
         return $tricks;
     }
 
-    public function getTrick(int $id): Trick
-    {
-        $trick = $this->em->getRepository(Trick::class)->find($id);
-
-        return $trick;
-    }
-
-    public function createTrick(): void
-    {
-
-    }
-
     #[Route(path: '/deleteTrick/{id}', name: 'delete_trick')]
     public function deleteTrick(int $id): Response  //Response
     {
-        $trick = $this->getTrick($id);
+        $trick = $this->em->getRepository(Trick::class)->find($id);
 
         $this->em->remove($trick);
         $this->em->flush();

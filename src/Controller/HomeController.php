@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Trick;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
@@ -16,11 +17,10 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        $tricks = new TrickController($this->em);
-        $arrayTricks = $tricks->getTricks();
+        $tricks = $this->em->getRepository(Trick::class)->findAll();
 
         return $this->render('home/homePage.html.twig', [
-            'tricks' => $arrayTricks,
+            'tricks' => $tricks,
         ]);
     }
 }
