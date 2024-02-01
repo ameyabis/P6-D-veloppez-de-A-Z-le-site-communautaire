@@ -2,15 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Trick;
 use App\Entity\User;
+use App\Entity\Trick;
+use App\Entity\Comment;
 use App\Form\CreateTrickType;
+use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
 {
@@ -54,12 +56,15 @@ class TrickController extends AbstractController
     }
 
     #[Route(path: '/trick/{id}', name: 'one_trick')]
-    public function showOneTrick(int $id): Response
-    {
+    public function showOneTrick(
+        int $id,
+    ): Response {
         $trick = $this->em->getRepository(Trick::class)->find($id);
+        $comments = $this->em->getRepository(Comment::class)->findBy(['trick' => $id]);
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
+            'comments' => $comments
         ]);
     }
 
@@ -68,6 +73,16 @@ class TrickController extends AbstractController
         $tricks = $this->em->getRepository(Trick::class)->findAll();
 
         return $tricks;
+    }
+
+    #[Route(path: '/tricks', name: 'all_tricks')]
+    public function showTricks() : Response
+    {
+        $tricks = $this->em->getRepository(Trick::class)->findAll();
+
+        return $this->render('page/tricks.html.twig', [
+            'tricks' => $tricks,
+        ]);
     }
 
     #[Route(path: '/deleteTrick/{id}', name: 'delete_trick')]
