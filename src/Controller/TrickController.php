@@ -76,7 +76,7 @@ class TrickController extends AbstractController
     }
 
     #[Route(path: '/tricks', name: 'all_tricks')]
-    public function showTricks() : Response
+    public function showTricks(): Response
     {
         $tricks = $this->em->getRepository(Trick::class)->findAll();
 
@@ -94,5 +94,32 @@ class TrickController extends AbstractController
         $this->em->flush();
 
         return $this->redirectToRoute('app_home');
+    }
+
+    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
+    public function editTrick(
+        int $id,
+        Request $request
+    ): Response {
+        $dateNow = new \DateTime();
+        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
+        $dateNow->format('Y-m-d H:i:s');
+
+        $trick = $this->em->getRepository(Trick::class)->find($id);
+
+        $formTrick = $this->createForm(CreateTrickType::class, $trick);
+        $formTrick->handleRequest($request);
+
+        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
+            $completedForm = $request->request->all()["create_trick"];
+            $trick->setName($completedForm['name']);
+            $trick->setGroupTrick($completedForm['groupTrick']);
+            $trick->setDescription($completedForm['description']);
+            $trick->setDateEdit($dateNow);
+        }
+
+        return $this->render('crud/formEditTrick.html.twig', [
+            'formTrick' => $formTrick->createView(),
+        ]);
     }
 }
