@@ -26,5 +26,13 @@
             </div>
         </div>
     </section>
+    <div>
+        {{ form_start(formComment) }}
+        {# {{ form_label(formComment.content) }} #}
+        {{ form_widget(formComment.content) }}
+        {{ form_rest(formComment) }}
+        <button type="submit">Valider</button>
+        {{ form_end(formComment) }}
+    </div>
 </div>
 {% endblock %}
