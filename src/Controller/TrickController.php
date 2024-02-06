@@ -116,10 +116,18 @@ class TrickController extends AbstractController
             $trick->setGroupTrick($completedForm['groupTrick']);
             $trick->setDescription($completedForm['description']);
             $trick->setDateEdit($dateNow);
+
+            $this->em->persist($trick);
+            $this->em->flush();
+
+            return $this->render('home/homePage.html.twig', [
+                'tricks' => $this->getTricks()
+            ]);
+        } else {
+            return $this->render('crud/formEditTrick.html.twig', [
+                'formTrick' => $formTrick->createView(),
+            ]);
         }
 
-        return $this->render('crud/formEditTrick.html.twig', [
-            'formTrick' => $formTrick->createView(),
-        ]);
     }
 }
