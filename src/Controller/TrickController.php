@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Trick;
+use App\Entity\Video;
 use App\Entity\Comment;
 use App\Form\CommentType;
 use App\Form\CreateTrickType;
-use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,14 +37,22 @@ class TrickController extends AbstractController
 
         if ($formTrick->isSubmitted() && $formTrick->isValid()) {
             $completedForm = $request->request->all()["create_trick"];
+
+            $video = new Video();
+            $video->setUrl($completedForm['videos']['url']);
+
             $trick->setName($completedForm['name']);
             $trick->setGroupTrick($completedForm['groupTrick']);
             $trick->setDescription($completedForm['description']);
             $trick->setDateCreate($dateNow);
             $trick->setUser($user);
+            $trick->addVideo($video);
 
+            $this->em->persist($video);
             $this->em->persist($trick);
             $this->em->flush();
+            // $id = $trick->getId();
+            // dd($id);
 
             return $this->render('home/homePage.html.twig', [
                 'tricks' => $this->getTricks()

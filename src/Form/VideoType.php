@@ -2,29 +2,24 @@
 
 namespace App\Form;
 
-use App\Entity\Trick;
-use App\Form\VideoType;
+use App\Entity\Video;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class CreateTrickType extends AbstractType
+class VideoType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('description', TextareaType::class)
-            ->add('groupTrick')
-            ->add('videos', VideoType::class)
+            ->add('url')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Trick::class,
+            // 'data_class' => Video::class,
         ]);
     }
 }
