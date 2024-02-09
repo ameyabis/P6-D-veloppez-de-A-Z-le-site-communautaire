@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div>
+        <p>Nom d'utilisateur: {{ user.username }}</p>
+        <p>Email: {{ user.email }}</p>
+        {# <a href="{{ path('forgot_password') }}">Mot de passe oublié</a> #}
+        <a class="btn btn-primary" href="">Mot de passe oublié</a>
+    </div>
+    <div>
+
+    </div>
+</div>
+
+{% endblock body %}
