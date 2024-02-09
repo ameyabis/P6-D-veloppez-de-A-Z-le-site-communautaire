@@ -15,16 +15,30 @@
                 <div class="col-8 d-flex flex-column align-items-center">
                     <p>Groupe de figure: {{ trick.groupTrick }}</p>
                     <p>{{ trick.description }}</p>
-                    
+
                 </div>
                 <div class="col-4 d-flex flex-column align-items-end pe-3 w-100">
                     <p>Créé le: {{ trick.dateCreate|date('d-m-Y') }}</p>
-                    {% if trick.dateEdit is defined %}
+                    {% if trick.dateEdit != null %}
                     <p>Modifié le: {{ trick.dateEdit|date('d-m-Y') }}</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </section>
+    <div>
+        {{ form_start(formComment) }}
+        {{ form_widget(formComment.content) }}
+        {{ form_rest(formComment) }}
+        <button type="submit">Valider</button>
+        {{ form_end(formComment) }}
+    </div>
+    <div>
+        {% for comment in comments %}
+        <div>
+            <p>{{ comment.content }}</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

@@ -22,6 +22,9 @@
             {{ form_widget(formTrick.description, {'attr': {'class': 'form-control'}}) }}
         </div>
 
+        {{ form_label(formTrick.videos.url) }}
+        {{ form_widget(formTrick.videos.url, {'attr': {'class': 'form-control'}}) }}
+
         {{ form_rest(formTrick) }}
         <button type="submit" class="btn btn-primary col-6">Valider</button>
     </div>
