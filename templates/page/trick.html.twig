@@ -8,8 +8,9 @@
         <h1>{{ trick.name }}</h1>
         <div class="col d-flex flex-lg-row-reverse flex-wrap justify-content-center">
             <div class="col-12 col-lg-6">
-                <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
-                    class="card-img-top" alt="...">
+                {% for video in videos %}
+                <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                {% endfor %}
             </div>
             <div class="col-12 col-lg-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
                 <div class="col-8 d-flex flex-column align-items-center">
@@ -23,6 +24,7 @@
                     <p>Modifié le: {{ trick.dateEdit|date('d-m-Y') }}</p>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </section>

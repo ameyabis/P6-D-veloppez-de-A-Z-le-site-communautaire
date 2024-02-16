@@ -22,67 +22,65 @@
             {{ form_widget(formTrick.description, {'attr': {'class': 'form-control'}}) }}
         </div>
 
-        {{ form_label(formTrick.videos.url) }}
-        {{ form_widget(formTrick.videos.url, {'attr': {'class': 'form-control'}}) }}
+        <ul class="videos" data-index="{{ formTrick.videos|length > 0 ? formTrick.videos|last.vars.name + 1 : 0 }}"
+            data-prototype="{{ form_widget(formTrick.videos.vars.prototype)|e('html_attr') }}"></ul>
 
         {{ form_rest(formTrick) }}
         <button type="submit" class="btn btn-primary col-6">Valider</button>
     </div>
     {{ form_end(formTrick) }}
 </div>
-{# <form method="post" action="" enctype="multipart/form-data">
-    <div class="col col-12 d-flex flex-column align-items-center">
-        <div class="row col-12 d-flex justify-content-center">
-            <div class="col-lg-5 mb-3">
-                <label for="nameTrick" class="form-label">Nom de la figure: </label>
-                <input type="text" class="form-control" id="nameTrick">
-            </div>
-            <div class="col-lg-5 mb-3">
-                <label for="groupTrick" class="form-label">Groupe de la figure: </label>
-                <input type="text" class="form-control" id="groupTrick">
-            </div>
-        </div>
-        <div class="col-12 col-lg-10 mb-3">
-            <label for="descriptionTrick" class="form-label">Description: </label>
-            <textarea type="textarea" class="form-control" id="descriptionTrick" rows="5" cols="33"
-                placeholder="Veuillez expliquer et donner des détails sur votre figure"></textarea>
-        </div>
-
-        <div class="d-flex">
-            <div class="col-lg-10 mb-3">
-                <label for="formFileMultiple" class="form-label">Multiple files input example</label>
-                <input class="form-control" type="file" id="formFileMultiple" multiple>
-            </div>
-
-            <div>
-                <button class="btn btn-secondary" type="button" onclick="addImageField()">
-                    <i class="fa-regular fa-image"></i>
-                </button>
-                <button class="btn btn-secondary" type="button" onclick="removeImageField()">
-                    <i class="fa-solid fa-minus"></i>
-                </button>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary col-6">Valider</button>
-    </div>
-</form> #}
 <script>
-    function addImageField() {
-        var imageFieldsDiv = document.getElementById("imageFields");
-        var newImageField = document.createElement("input");
+    const addVideoLink = document.createElement('a')
+    addVideoLink.classList.add('add_item_link')
+    addVideoLink.href = '#'
+    addVideoLink.innerText = 'Ajouter une video'
+    addVideoLink.dataset.collectionHolderClass = 'videos'
 
-        newImageField.setAttribute("type", "file");
-        newImageField.setAttribute("name", "imageTrick[]");
-        newImageField.setAttribute("accept", "image/*");
-        imageFieldsDiv.appendChild(newImageField);
+    const newLinkLi = document.createElement('li').append(addVideoLink)
+
+    const collectionHolder = document.querySelector('ul.videos')
+    collectionHolder.appendChild(addVideoLink)
+
+    document.querySelectorAll('ul.tags li')
+    .forEach((video) => {
+        addTagFormDeleteLink(video)
+    })
+
+    const addFormToCollection = (e) => {
+        const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
+    
+          const item = document.createElement('li');
+    
+          item.innerHTML = collectionHolder
+            .dataset
+            .prototype
+            .replace(
+              /__name__/g,
+              collectionHolder.dataset.index
+            );
+    
+          collectionHolder.appendChild(item);
+    
+          collectionHolder.dataset.index++;
+
+          addTagFormDeleteLink(item);
     }
-    function removeImageField() {
-        var imageFieldsDiv = document.getElementById("imageFields");
-        var imageFields = imageFieldsDiv.getElementsByTagName("input");
-        if (imageFields.length > 1) {
-            imageFields[imageFields.length - 1].remove();
-        }
+    
+    addVideoLink.addEventListener("click", addFormToCollection)
+
+    const addTagFormDeleteLink = (item) => {
+        const removeFormButton = document.createElement('button');
+        removeFormButton.innerText = 'Supprimer';
+    
+        item.append(removeFormButton);
+    
+        removeFormButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            item.remove();
+        });
     }
+
+
 </script>
 {% endblock body %}

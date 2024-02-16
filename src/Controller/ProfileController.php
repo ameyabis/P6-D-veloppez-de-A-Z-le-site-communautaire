@@ -20,7 +20,10 @@ class ProfileController extends AbstractController
     public function showProfile(
     #[CurrentUser] ?User $user
     ): Response {
-        dd($user);
+        // dd($user);
+        // if($user->getProfilePicture() === null) {
+        //     $user->setProfilePicture();
+        // }
 
         return $this->render('page/profile.html.twig', [
             'user' => $user,

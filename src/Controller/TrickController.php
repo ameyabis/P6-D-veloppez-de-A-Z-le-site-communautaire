@@ -38,21 +38,21 @@ class TrickController extends AbstractController
         if ($formTrick->isSubmitted() && $formTrick->isValid()) {
             $completedForm = $request->request->all()["create_trick"];
 
-            $video = new Video();
-            $video->setUrl($completedForm['videos']['url']);
-
             $trick->setName($completedForm['name']);
             $trick->setGroupTrick($completedForm['groupTrick']);
             $trick->setDescription($completedForm['description']);
             $trick->setDateCreate($dateNow);
             $trick->setUser($user);
-            $trick->addVideo($video);
 
-            $this->em->persist($video);
             $this->em->persist($trick);
+
+            foreach ($trick->getVideos() as $video) {
+                $video->setTrick($trick);
+
+                $this->em->persist($video);
+            }
+
             $this->em->flush();
-            // $id = $trick->getId();
-            // dd($id);
 
             return $this->render('home/homePage.html.twig', [
                 'tricks' => $this->getTricks()
@@ -70,8 +70,12 @@ class TrickController extends AbstractController
         Request $request,
     #[CurrentUser] ?User $user,
     ): Response {
+        $dateNow = new \DateTime();
+        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
+        $dateNow->format('Y-m-d H:i:s');
+
         $trick = $this->em->getRepository(Trick::class)->find($id);
-        $comments = $this->em->getRepository(Comment::class)->findBy(['trick' => $id]);
+        $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
 
         $comment = new Comment();
 
@@ -83,13 +87,24 @@ class TrickController extends AbstractController
             $comment->setContent($completedForm['content']);
             $comment->setUser($user);
             $comment->setTrick($trick);
+            $comment->setDateCreate($dateNow);
 
             $this->em->persist($comment);
             $this->em->flush();
+
+            $commentForm = $this->createForm(CommentType::class, $comment);
+            $commentForm->get('content')->setData(null);
         }
+
+        $comments = $this->em->getRepository(Comment::class)->findBy(
+            ['trick' => $id],
+            ['id' => 'DESC'],
+            5
+        );
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
+            'videos' => $videos,
             'comments' => $comments,
             'formComment' => $commentForm,
         ]);
