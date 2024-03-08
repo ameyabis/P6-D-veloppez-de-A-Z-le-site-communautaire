@@ -1,0 +1,143 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container-fluid container-lg">
+    {{ form_start(formTrick) }}
+    <div class="col col-12 d-flex flex-column align-items-center">
+        <div class="row col-12 d-flex justify-content-center">
+
+            <div class="col-lg-5 mb-3">
+                {{ form_label(formTrick.name) }}
+                {{ form_widget(formTrick.name, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-lg-5 mb-3">
+                {{ form_label(formTrick.groupTrick) }}
+                {{ form_widget(formTrick.groupTrick, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-10 mb-3">
+            {{ form_label(formTrick.description) }}
+            {{ form_widget(formTrick.description, {'attr': {'class': 'form-control'}}) }}
+        </div>
+
+        <ul class="videos px-0 col-6 d-flex flex-column justify-content-center"
+            data-index="{{ formTrick.videos|length > 0 ? formTrick.videos|last.vars.name + 1 : 0 }}"
+            data-prototype="{{ form_widget(formTrick.videos.vars.prototype)|e('html_attr') }}"></ul>
+
+        <ul class="pictures"
+            data-index="{{ formTrick.pictures|length > 0 ? formTrick.pictures|last.vars.name + 1 : 0 }}"
+            data-prototype="{{ form_widget(formTrick.pictures.vars.prototype)|e('html_attr') }}"></ul>
+
+        {{ form_rest(formTrick) }}
+        <button type="submit" class="btn btn-primary col-6">Valider</button>
+    </div>
+    {{ form_end(formTrick) }}
+</div>
+<script>
+    const addVideoLink = document.createElement('a');
+    addVideoLink.classList.add('add_item_link', 'btn', 'btn-primary', 'm-0');
+    addVideoLink.href = '#';
+    addVideoLink.innerText = 'Ajouter une video';
+    addVideoLink.dataset.collectionHolderClass = 'videos';
+
+    const newLinkLi = document.createElement('li');
+    newLinkLi.append(addVideoLink);
+
+    const collectionHolder = document.querySelector('ul.videos');
+    collectionHolder.appendChild(addVideoLink);
+
+    document.querySelectorAll('ul.tags li')
+        .forEach((video) => {
+            addTagFormDeleteLink(video);
+        })
+
+    const addFormToCollection = (e) => {
+        const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
+
+        const item = document.createElement('li');
+        item.classList.add('list-group-item', 'd-flex', 'justify-content-center', 'my-2');
+
+        item.innerHTML = collectionHolder
+            .dataset
+            .prototype
+            .replace(
+                /__name__/g,
+                collectionHolder.dataset.index
+            );
+
+        collectionHolder.appendChild(item);
+
+        collectionHolder.dataset.index++;
+
+        addTagFormDeleteLink(item);
+    }
+
+    addVideoLink.addEventListener("click", addFormToCollection);
+
+    const addTagFormDeleteLink = (item) => {
+        const removeFormButton = document.createElement('button');
+        removeFormButton.innerText = 'X';
+        removeFormButton.classList.add('btn', 'btn-light');
+
+        item.append(removeFormButton);
+
+        removeFormButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            item.remove();
+        });
+    }
+
+
+
+    const addImageLink = document.createElement('input');
+    addImageLink.setAttribute('type', 'file');
+    addImageLink.setAttribute('accept', 'image/png, image/jpg, image/jpeg');
+    addImageLink.setAttribute('multiple', 'true');
+    addImageLink.classList.add('add_item_link', 'btn', 'btn-primary');
+    addImageLink.href = '#';
+    addImageLink.innerText = 'Ajouter une image';
+    addImageLink.dataset.collectionHolderClass = 'images';
+
+    const imageCollectionHolder = document.querySelector('ul.pictures');
+    imageCollectionHolder.appendChild(addImageLink);
+
+    // Fonction pour ajouter un formulaire d'image à la collection
+    const addImageFormToCollection = (e) => {
+        const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
+
+        const item = document.createElement('li');
+
+        item.innerHTML = collectionHolder
+            .dataset
+            .prototype
+            .replace(
+                /__name__/g,
+                collectionHolder.dataset.index
+            );
+
+        collectionHolder.appendChild(item);
+
+        collectionHolder.dataset.index++;
+
+        addImageFormDeleteLink(item);
+    }
+
+    // Ecouter le clic sur le lien d'ajout d'image
+    addImageLink.addEventListener("click", addImageFormToCollection);
+
+    // Ajouter le lien de suppression pour l'image
+    const addImageFormDeleteLink = (item) => {
+        const removeFormButton = document.createElement('button');
+        removeFormButton.innerText = 'Supprimer';
+
+        item.append(removeFormButton);
+
+        removeFormButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            item.remove();
+        });
+    }
+</script>
+{% endblock body %}

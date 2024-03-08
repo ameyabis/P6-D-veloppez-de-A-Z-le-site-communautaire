@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\VideoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
@@ -19,7 +17,6 @@ class Video
     private ?string $url = null;
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
-    // #[ORM\JoinColumn(name: 'trick_id', referencedColumnName:'id')]
     private ?Trick $trick = null;
 
     public function getId(): ?int

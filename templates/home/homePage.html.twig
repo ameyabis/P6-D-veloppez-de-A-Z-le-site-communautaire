@@ -10,9 +10,10 @@
             <h1>Bienvenue sur SnowTricks !</h1>
             <span>N'éhistez pas à partager & discuter avec tout le monde.</span>
         </div>
+        <a href="#trick" class="btn text-white align-items-end"><i class="fa-solid fa-square-caret-down"></i></a>
     </section>
 
-    <section class="container-fluid d-flex flex-column align-items-center">
+    <section id="trick" class="container-fluid d-flex flex-column align-items-center">
         <h1>Tricks</h1>
         <div class="col d-flex flex-wrap justify-content-center">
             {% for trick in tricks %}
@@ -21,13 +22,16 @@
                     <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
                         class="card-img-top" alt="...">
                     <div class="col-12 d-flex align-items-center">
-                        <a href="{{ path('one_trick', {'id': trick.id}) }}" class="col-10 text-dark text-decoration-none">
+                        <a href="{{ path('one_trick', {'id': trick.id}) }}"
+                            class="col-10 text-dark text-decoration-none">
                             <h2 class="col-10">{{ trick.name }}</h2>
                         </a>
-                        <a class="col-1 text-dark text-decoration-none" href="{{ path('edit_trick', {'id': trick.id}) }}">
+                        <a class="col-1 text-dark text-decoration-none"
+                            href="{{ path('edit_trick', {'id': trick.id}) }}">
                             <i class="col-1 fa-solid fa-pen"></i>
                         </a>
-                        <a class="col-1 text-dark text-decoration-none" href="{{ path('delete_trick', {'id': trick.id}) }}">
+                        <a class="col-1 text-dark text-decoration-none"
+                            href="{{ path('delete_trick', {'id': trick.id}) }}">
                             <i class="fa-solid fa-trash"></i>
                         </a>
                     </div>
@@ -35,6 +39,7 @@
             </div>
             {% endfor %}
         </div>
+        <a href="#navbar" class="btn text-white"><i class="fa-solid fa-square-caret-up"></i></a>
     </section>
 </div>
 {% endblock %}

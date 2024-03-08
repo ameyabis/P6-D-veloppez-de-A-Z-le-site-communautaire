@@ -4,43 +4,51 @@
 
 {% block body %}
 <div class="container-fluid p-0 text-white">
-    <section class="container-fluid d-flex flex-column align-items-center">
-        <h1>{{ trick.name }}</h1>
-        <div class="col d-flex flex-lg-row-reverse flex-wrap justify-content-center">
-            <div class="col-12 col-lg-6">
-                {% for video in videos %}
-                <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <div class="d-flex flex-column justify-content-center">
+        <section class="container-fluid d-flex flex-column align-items-center">
+            <h1>{{ trick.name }}</h1>
+            <div class="col d-flex flex-lg-row-reverse flex-wrap justify-content-center">
+                <div class="col-12 col-lg-6">
+                    {% for video in videos %}
+                    <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                    {% endfor %}
+                </div>
+                <div class="col-12 col-lg-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
+                    <div class="col-8 d-flex flex-column align-items-center">
+                        <p>Groupe de figure: <b>{{ trick.groupTrick }}</b></p>
+                        <p>{{ trick.description }}</p>
+
+                    </div>
+                    <div class="col-4 d-flex flex-column align-items-end pe-3 w-100">
+                        <p>Créé le: {{ trick.dateCreate|date('d-m-Y') }}</p>
+                        {% if trick.dateEdit != null %}
+                        <p>Modifié le: {{ trick.dateEdit|date('d-m-Y') }}</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <div class="col-12 d-flex flex-column align-items-center">
+            {% if app.user %}
+            <div class="col-6">
+                {{ form_start(formComment, { attr: { class: "d-flex flex-column justify-content-center m-3" }}) }}
+                {{ form_widget(formComment.content) }}
+                {{ form_rest(formComment) }}
+                <button class="btn btn-primary" type="submit">Valider</button>
+                {{ form_end(formComment) }}
+            </div>
+            {% endif %}
+            <div>
+                {% for comment in comments %}
+                <div>
+                    <p>{{ comment.content }}</p>
+                </div>
                 {% endfor %}
             </div>
-            <div class="col-12 col-lg-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
-                <div class="col-8 d-flex flex-column align-items-center">
-                    <p>Groupe de figure: {{ trick.groupTrick }}</p>
-                    <p>{{ trick.description }}</p>
-
-                </div>
-                <div class="col-4 d-flex flex-column align-items-end pe-3 w-100">
-                    <p>Créé le: {{ trick.dateCreate|date('d-m-Y') }}</p>
-                    {% if trick.dateEdit != null %}
-                    <p>Modifié le: {{ trick.dateEdit|date('d-m-Y') }}</p>
-                    {% endif %}
-                </div>
-
-            </div>
         </div>
-    </section>
-    <div>
-        {{ form_start(formComment) }}
-        {{ form_widget(formComment.content) }}
-        {{ form_rest(formComment) }}
-        <button type="submit">Valider</button>
-        {{ form_end(formComment) }}
-    </div>
-    <div>
-        {% for comment in comments %}
-        <div>
-            <p>{{ comment.content }}</p>
-        </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

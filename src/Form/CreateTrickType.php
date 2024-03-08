@@ -21,9 +21,15 @@ class CreateTrickType extends AbstractType
             ->add('groupTrick', TextType::class)
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideoType::class,
-                // 'entry_options' => ['label' => false],
                 'allow_add' => true,
-                'allow_delete' => true
+                'allow_delete' => true,
+                'label' => false,
+            ])
+            ->add('pictures', CollectionType::class, [
+                'entry_type' => PictureType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'label' => false
             ])
         ;
     }

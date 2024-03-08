@@ -58,7 +58,7 @@ class TrickController extends AbstractController
                 'tricks' => $this->getTricks()
             ]);
         } else {
-            return $this->render('crud/formCreateTrick.html.twig', [
+            return $this->render('crud/formTrick.html.twig', [
                 'formTrick' => $formTrick,
             ]);
         }
@@ -166,7 +166,7 @@ class TrickController extends AbstractController
                 'tricks' => $this->getTricks()
             ]);
         } else {
-            return $this->render('crud/formEditTrick.html.twig', [
+            return $this->render('crud/formTrick.html.twig', [
                 'formTrick' => $formTrick->createView(),
             ]);
         }

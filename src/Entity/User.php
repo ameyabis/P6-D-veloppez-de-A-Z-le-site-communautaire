@@ -38,6 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
 
+    #[ORM\Column(length: 255)]
+    private $resetToken;
+
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Comment::class)]
     private Collection $comments;
 
@@ -139,6 +142,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
 
         return $this;
     }
