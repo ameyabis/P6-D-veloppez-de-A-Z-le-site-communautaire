@@ -38,10 +38,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
 
+    #[ORM\Column(length: 255)]
+    private $resetToken;
+
     #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: Comment::class)]
     private Collection $comments;
 
-    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    #[ORM\Column(length: 255)]
     private $profilePicture = null;
 
     public function __construct()
@@ -143,6 +146,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function setResetToken(string $resetToken): static
+    {
+        $this->resetToken = $resetToken;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Comment>
      */
@@ -173,12 +188,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getProfilePicture()
+    public function getProfilePicture(): string
     {
         return $this->profilePicture;
     }
 
-    public function setProfilePicture($profilePicture): static
+    public function setProfilePicture(string $profilePicture): static
     {
         $this->profilePicture = $profilePicture;
 

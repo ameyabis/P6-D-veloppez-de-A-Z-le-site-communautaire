@@ -14,7 +14,7 @@
                     <a href="{{ path('one_trick', {'id': trick.id}) }}" class="col-10 text-dark text-decoration-none">
                         <h2 class="col-10">{{ trick.name }}</h2>
                     </a>
-                    <a class="col-1 text-dark text-decoration-none" href="">
+                    <a class="col-1 text-dark text-decoration-none" href="{{ path('edit_trick', {'id': trick.id}) }}">
                         <i class="col-1 fa-solid fa-pen"></i>
                     </a>
                     <a class="col-1 text-dark text-decoration-none" href="{{ path('delete_trick', {'id': trick.id}) }}">

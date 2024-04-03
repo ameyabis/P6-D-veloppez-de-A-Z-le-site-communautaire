@@ -27,8 +27,24 @@
     {% block header %}
     {% include "layout/header.html.twig" %}
     {% endblock header %}
+
+    {% if app.user and app.user.isVerified == false %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <strong>Votre compte n'est pas activé</strong>, 
+                <a href="{{ path('resend_verif') }}">renvoyer le lien de confirmation</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% include "layout/flash.html.twig" %}
+
     {% block body %}{% endblock %}
+
+    {% block footer %}
     {% include "layout/footer.html.twig" %}
+    {% endblock footer %}
 </body>
 
 </html>

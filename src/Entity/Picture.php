@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\PictureRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PictureRepository::class)]
@@ -15,35 +13,16 @@ class Picture
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
     #[ORM\Column(length: 500)]
     private ?string $url = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'pictures')]
     private ?Trick $trick = null;
-
-    public function __construct()
-    {
-        $this->idTrick = new ArrayCollection();
-    }
+    private ?string $type = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getUrl(): ?string
@@ -66,6 +45,18 @@ class Picture
     public function setTrick(?Trick $trick): static
     {
         $this->trick = $trick;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

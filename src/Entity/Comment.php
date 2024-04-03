@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CommentRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
@@ -22,6 +23,9 @@ class Comment
 
     #[ORM\ManyToOne]
     private ?Trick $trick = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateCreate = null;
 
     public function getId(): ?int
     {
@@ -60,6 +64,18 @@ class Comment
     public function setTrick(?Trick $trick): static
     {
         $this->trick = $trick;
+
+        return $this;
+    }
+
+    public function getDateCreate(): ?\DateTimeInterface
+    {
+        return $this->dateCreate;
+    }
+
+    public function setDateCreate(\DateTimeInterface $dateCreate): static
+    {
+        $this->dateCreate = $dateCreate;
 
         return $this;
     }
