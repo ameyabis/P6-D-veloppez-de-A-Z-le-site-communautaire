@@ -1,16 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Snowtricks{% endblock %}
 
 {% block body %}
 <div class="container-fluid p-0">
-    <section class="vh-100 d-flex justify-content-center align-items-center"
+    <section class="vh-100 d-flex flex-column align-items-center"
         style="background-image: url(https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg); background-position: center;">
-        <div class="" style="color: #F8F9FA;">
+        <div class="d-flex h-100 flex-column justify-content-center align-items-center text-white">
             <h1>Bienvenue sur SnowTricks !</h1>
             <span>N'éhistez pas à partager & discuter avec tout le monde.</span>
         </div>
-        <a href="#trick" class="btn text-white align-items-end"><i class="fa-solid fa-square-caret-down"></i></a>
+        <div class="col-12 d-flex flex-row-reverse">
+            <a href="#trick" class="btn text-white align-items-end"><i class="fa-solid fa-square-caret-down fa-2xl"></i>
+            </a>
+        </div>
     </section>
 
     <section id="trick" class="container-fluid d-flex flex-column align-items-center">
@@ -39,7 +42,9 @@
             </div>
             {% endfor %}
         </div>
-        <a href="#navbar" class="btn text-white"><i class="fa-solid fa-square-caret-up"></i></a>
+        <div class="col-12 d-flex flex-row-reverse">
+            <a href="#navbar" class="btn text-white"><i class="fa-solid fa-square-caret-up fa-2xl"></i></a>
+        </div>
     </section>
 </div>
 {% endblock %}

@@ -46,6 +46,7 @@ class Trick
     public function __construct()
     {
         $this->videos = new ArrayCollection();
+        $this->pictures = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
@@ -157,7 +158,7 @@ class Trick
     }
 
     /**
-     * @return Collection<int, Video>
+     * @return Collection<int, Picture>
      */
     public function getPictures(): Collection
     {

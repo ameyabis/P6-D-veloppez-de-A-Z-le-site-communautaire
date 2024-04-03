@@ -5,11 +5,12 @@ namespace App\Form;
 use App\Entity\Trick;
 use App\Form\VideoType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CreateTrickType extends AbstractType
 {
@@ -25,11 +26,14 @@ class CreateTrickType extends AbstractType
                 'allow_delete' => true,
                 'label' => false,
             ])
-            ->add('pictures', CollectionType::class, [
-                'entry_type' => PictureType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'label' => false
+            ->add('pictures', FileType::class, [
+                'label' => false,
+                'multiple' => true,
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
         ;
     }

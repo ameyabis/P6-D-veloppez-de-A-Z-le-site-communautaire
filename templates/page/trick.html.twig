@@ -7,19 +7,57 @@
     <div class="d-flex flex-column justify-content-center">
         <section class="container-fluid d-flex flex-column align-items-center">
             <h1>{{ trick.name }}</h1>
-            <div class="col d-flex flex-lg-row-reverse flex-wrap justify-content-center">
+            <div class="col-12 d-flex flex-lg-row-reverse flex-wrap justify-content-center">
                 <div class="col-12 col-lg-6">
-                    {% for video in videos %}
+                    {# {% for video in videos %}
                     <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen></iframe>
-                    {% endfor %}
+                    {% endfor %} #}
+                    <div id="carouselTrick" class="carousel slide">
+                        <div class="carousel-indicators">
+                            {% set count = 0 %}
+                            {% for attachment in attachments %}
+                            <button type="button" data-bs-target="#carouselTrick" data-bs-slide-to="{{ count }}" {% if
+                                count==0 %}class="active" {% endif %}></button>
+                            {% set count = count + 1 %}
+                            {% endfor %}
+                        </div>
+                        <div class="carousel-inner">
+                            {% set count = 0 %}
+                            {% for attachment in attachments %}
+                            {% if attachment.type == 'video' %}
+                            <div class="carousel-item{% if count == 0 %} active{% endif %}">
+                                <iframe class="col-12" height="380" src="{{ attachment.url }}"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen></iframe>
+                            </div>
+                            {% elseif attachment.type == 'picture' %}
+                            <div class="carousel-item{% if count == 0 %} active{% endif %}">
+                                <img class="col-12" style="height: 380px; object-fit: cover;"
+                                    src="{{ asset('assets/uploads/'~attachment.url) }}" alt="">
+                            </div>
+                            {% endif %}
+                            {% set count = count + 1 %}
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselTrick"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Précédent</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselTrick"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Suivant</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="col-12 col-lg-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
                     <div class="col-8 d-flex flex-column align-items-center">
                         <p>Groupe de figure: <b>{{ trick.groupTrick }}</b></p>
                         <p>{{ trick.description }}</p>
-
                     </div>
                     <div class="col-4 d-flex flex-column align-items-end pe-3 w-100">
                         <p>Créé le: {{ trick.dateCreate|date('d-m-Y') }}</p>
@@ -27,7 +65,6 @@
                         <p>Modifié le: {{ trick.dateEdit|date('d-m-Y') }}</p>
                         {% endif %}
                     </div>
-
                 </div>
             </div>
         </section>
@@ -43,8 +80,21 @@
             {% endif %}
             <div>
                 {% for comment in comments %}
-                <div>
-                    <p>{{ comment.content }}</p>
+                <div class="d-flex flex-start m-3">
+                    {% if comment.user.profilePicture is null %}
+                    <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('image/pp_base.jpg') }}" alt="avatar"
+                        width="60" height="60" />
+                    {% else %}
+                    <img class="rounded-circle shadow-1-strong me-3"
+                        src="{{ asset('assets/uploads/'~comment.user.profilePicture) }}" alt="avatar" width="60"
+                        height="60" />
+                    {% endif %}
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ comment.user.username }}</h6>
+                        <p class="mb-0">
+                            {{ comment.content }}
+                        </p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>

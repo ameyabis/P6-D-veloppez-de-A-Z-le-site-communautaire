@@ -18,6 +18,7 @@ class Video
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
     private ?Trick $trick = null;
+    private ?string $type = null;
 
     public function getId(): ?int
     {
@@ -44,6 +45,18 @@ class Video
     public function setTrick(?Trick $trick): static
     {
         $this->trick = $trick;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }
