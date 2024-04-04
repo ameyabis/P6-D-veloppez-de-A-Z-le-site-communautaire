@@ -131,7 +131,6 @@ class TrickController extends AbstractController
             5
         );
 
-
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
             'attachments' => $attachments,
@@ -159,7 +158,7 @@ class TrickController extends AbstractController
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/deleteTrick/{id}', name: 'delete_trick')]
-    public function deleteTrick(int $id): Response  //Response
+    public function deleteTrick(int $id): Response
     {
         $trick = $this->em->getRepository(Trick::class)->find($id);
 
