@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{% endblock %}
+{% block title %}{{ user.username }}{% endblock %}
 
 {% block body %}
 <section class="vh-100">
@@ -14,24 +14,27 @@
                                 alt="login form" class="img-fluid h-100 rounded-start-4" />
                         </div>
                         <div class="col-md-12 col-lg-7 d-flex align-items-center">
-                            <div class="d-flex flex-column align-items-center">
-                                <div class="card-body p-4 p-lg-5 text-black">
+                            <div class="col-12 d-flex flex-column align-items-center">
+                                <div class="col-12 d-flex flex-column align-items-center card-body p-4 p-lg-5 text-black">
                                     <p>Pseudonyme: <b>{{ user.username }}</b></p>
                                     <p>Email: <b>{{ user.email }}</b></p>
-                                    {{ form_start(form) }}
-                                    {{ form_row(form.profilePicture) }}
-                                    {{ form_rest(form) }}
-                                    <button type="submit" class="btn btn-primary col-6">Valider</button>
-                                    {{ form_end(form) }}
-                                    {# <a class="btn btn-primary" href="">Changer l'image de profile</a> #}
-                                    <a class="btn btn-primary" href="{{ path('forgotten_password') }}">
+                                    <div class="col-md-6 col-lg-7">
+                                        {{ form_start(form) }}
+                                        {{ form_row(form.profilePicture) }}
+                                        {{ form_rest(form) }}
+                                        <button type="submit" class="btn btn-primary col-12">Valider</button>
+                                        {{ form_end(form) }}
+                                    </div>
+                                    <a class="col-6 btn btn-primary" href="{{ path('forgotten_password') }}">
                                         Réinitialiser le mot de passe
                                     </a>
                                 </div>
-                                <p>Image de profile</p>
-                                {% if picture != NULL %}
-                                <img style="width: 200px; height: 200px; background-position: center;" src="{{ asset('assets/uploads/'~picture) }}" alt="">
-                                {% endif %}
+                                <div class="d-lg-flex flex-column align-items-center d-none">
+                                    <p>Image de profile</p>
+                                    {% if picture != NULL %}
+                                    <img style="width: 200px; height: 200px; background-position: center;"
+                                        src="{{ asset('assets/uploads/'~picture) }}" alt="">
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -39,6 +42,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </section>
 

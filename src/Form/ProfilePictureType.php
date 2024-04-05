@@ -18,7 +18,7 @@ class ProfilePictureType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'attr' => [
-                    'class' => 'form-control'
+                    'class' => 'col-6 form-control'
                 ]
             ])
         ;

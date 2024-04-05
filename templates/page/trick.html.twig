@@ -9,11 +9,6 @@
             <h1>{{ trick.name }}</h1>
             <div class="col-12 d-flex flex-lg-row-reverse flex-wrap justify-content-center">
                 <div class="col-12 col-lg-6">
-                    {# {% for video in videos %}
-                    <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen></iframe>
-                    {% endfor %} #}
                     <div id="carouselTrick" class="carousel slide">
                         <div class="carousel-indicators">
                             {% set count = 0 %}
@@ -54,7 +49,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-12 col-lg-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
+                <div class="col-12 col-md-6 d-flex flex-row flex-lg-column align-items-center justify-content-center">
                     <div class="col-8 d-flex flex-column align-items-center">
                         <p>Groupe de figure: <b>{{ trick.groupTrick }}</b></p>
                         <p>{{ trick.description }}</p>
@@ -81,7 +76,7 @@
             <div>
                 {% for comment in comments %}
                 <div class="d-flex flex-start m-3">
-                    {% if comment.user.profilePicture is null %}
+                    {% if comment.user.profilePicture == null %}
                     <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('image/pp_base.jpg') }}" alt="avatar"
                         width="60" height="60" />
                     {% else %}
