@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Picture;
 use App\Entity\Trick;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +17,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
+        //Donnée retourné a la page d'accueil
         $tricks = $this->em->getRepository(Trick::class)->findAll();
 
         return $this->render('home/homePage.html.twig', [

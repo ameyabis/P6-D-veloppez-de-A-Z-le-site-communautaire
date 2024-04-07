@@ -33,13 +33,16 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ProfilePictureType::class);
         $form->handleRequest($request);
 
+        //Traitement des données du formulaire pour modifier l'image de profile
         if ($form->isSubmitted() && $form->isValid()) {
             $updatePicture = $request->files->all()['profile_picture']['profilePicture'];
 
+            //On recupère l'extension du fichier
             $extension = $updatePicture->guessExtension();
             $path = $params->get('images_directory');
             $fichier = $updatePicture->getFileName();
 
+            //Nous donnons un autre nom a l'image
             $user->setProfilePicture($fichier . '.' . $extension);
 
             $this->em->persist($user);
