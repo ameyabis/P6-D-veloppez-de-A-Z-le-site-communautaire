@@ -25,14 +25,22 @@ class TrickController extends AbstractController
     ) {
     }
 
+    //Fonction pour créer et modifier notre trick
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/formTrick', name: 'form_trick')]
+    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
     public function createFormTrick(
+        ?int $id,
         Request $request,
         ParameterBagInterface $params,
     #[CurrentUser] ?User $user
     ): Response {
-        $trick = new Trick();
+        if ($id === null) {
+            $trick = new Trick();
+        } else {
+            $trick = $this->em->getRepository(Trick::class)->find($id);
+        }
+
         $dateNow = new \DateTime();
         $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
         $dateNow->format('Y-m-d H:i:s');
@@ -48,16 +56,20 @@ class TrickController extends AbstractController
             $trick->setGroupTrick($completedForm['groupTrick']);
             $trick->setDescription($completedForm['description']);
             $trick->setDateCreate($dateNow);
-            $trick->setUser($user);
+            if ($id === null) {
+                $trick->setUser($user);
+            }
 
             $this->em->persist($trick);
 
+            //Gestion des videos
             foreach ($trick->getVideos() as $video) {
                 $video->setTrick($trick);
 
                 $this->em->persist($video);
             }
 
+            //Gestion des images
             foreach ($pictures as $pictureUpload) {
                 $extension = $pictureUpload->guessExtension();
                 $path = $params->get('images_directory');
@@ -95,6 +107,7 @@ class TrickController extends AbstractController
 
         $trick = $this->em->getRepository(Trick::class)->find($id);
         $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
+        //Set->type pour différencier les videos des images
         foreach ($videos as $video) {
             $video->setType('video');
         }
@@ -166,64 +179,5 @@ class TrickController extends AbstractController
         $this->em->flush();
 
         return $this->redirectToRoute('app_home');
-    }
-
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
-    public function editTrick(
-        int $id,
-        Request $request,
-        ParameterBagInterface $params,
-    ): Response {
-        $dateNow = new \DateTime();
-        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
-        $dateNow->format('Y-m-d H:i:s');
-
-        $trick = $this->em->getRepository(Trick::class)->find($id);
-
-        $formTrick = $this->createForm(CreateTrickType::class, $trick);
-        $formTrick->handleRequest($request);
-
-        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
-            $completedForm = $request->request->all()["create_trick"];
-            $pictures = $request->files->all()['create_trick']['pictures'];
-
-            $trick->setName($completedForm['name']);
-            $trick->setGroupTrick($completedForm['groupTrick']);
-            $trick->setDescription($completedForm['description']);
-            $trick->setDateEdit($dateNow);
-
-            $this->em->persist($trick);
-
-            foreach ($trick->getVideos() as $video) {
-                $video->setTrick($trick);
-
-                $this->em->persist($video);
-            }
-
-            foreach ($pictures as $pictureUpload) {
-                $extension = $pictureUpload->guessExtension();
-                $path = $params->get('images_directory');
-                $fichier = $pictureUpload->getFileName();
-
-                $picture = new Picture();
-                $picture->setUrl($fichier . '.' . $extension);
-                $picture->setTrick($trick);
-
-                $this->em->persist($picture);
-                $pictureUpload->move($path . '/', $fichier . '.' . $extension);
-            }
-
-            $this->em->flush();
-
-            return $this->render('home/homePage.html.twig', [
-                'tricks' => $this->getTricks()
-            ]);
-        } else {
-            return $this->render('crud/formTrick.html.twig', [
-                'formTrick' => $formTrick->createView(),
-            ]);
-        }
-
     }
 }
