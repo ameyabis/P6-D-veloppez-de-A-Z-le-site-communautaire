@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,12 +17,23 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TrickRepository extends ServiceEntityRepository
 {
+    public const PAGINATOR_PER_PAGE = 5;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Trick::class);
     }
 
-//    /**
+    public function getTricksPaginator(int $offset): Paginator
+    {
+        $query = $this->createQueryBuilder('t')
+            ->setMaxResults(self::PAGINATOR_PER_PAGE)
+            ->setFirstResult($offset)
+            ->getQuery();
+
+        return new Paginator($query);
+    }
+
+    //    /**
 //     * @return Trick[] Returns an array of Trick objects
 //     */
 //    public function findByExampleField($value): array
@@ -36,7 +48,7 @@ class TrickRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Trick
+    //    public function findOneBySomeField($value): ?Trick
 //    {
 //        return $this->createQueryBuilder('t')
 //            ->andWhere('t.exampleField = :val')

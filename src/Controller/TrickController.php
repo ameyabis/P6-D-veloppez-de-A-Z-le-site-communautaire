@@ -9,6 +9,7 @@ use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
 use App\Form\CreateTrickType;
+use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,7 +34,7 @@ class TrickController extends AbstractController
         ?int $id,
         Request $request,
         ParameterBagInterface $params,
-    #[CurrentUser] ?User $user
+        #[CurrentUser] ?User $user
     ): Response {
         if ($id === null) {
             $trick = new Trick();
@@ -99,7 +100,7 @@ class TrickController extends AbstractController
     public function showOneTrick(
         int $id,
         Request $request,
-    #[CurrentUser] ?User $user,
+        #[CurrentUser] ?User $user,
     ): Response {
         $dateNow = new \DateTime();
         $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
@@ -160,12 +161,17 @@ class TrickController extends AbstractController
     }
 
     #[Route(path: '/tricks', name: 'all_tricks')]
-    public function showTricks(): Response
-    {
-        $tricks = $this->em->getRepository(Trick::class)->findAll();
+    public function showTricks(
+        Request $request,
+        TrickRepository $trickRepository
+    ): Response {
+        $offset = max(0, $request->query->getInt('offset', 0));
+        $paginator = $trickRepository->getTricksPaginator($offset);
 
         return $this->render('page/tricks.html.twig', [
-            'tricks' => $tricks,
+            'tricks' => $paginator,
+            'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
+            'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
         ]);
     }
 
