@@ -13,7 +13,6 @@ use App\Service\FormService;
 use App\Form\CreateTrickType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -41,21 +40,13 @@ class TrickController extends AbstractController
     ): Response {
         $trick = new Trick();
 
-        $formTrick = $this->addForm($trick);
-        $formTrick->handleRequest($request);
+        $formTrick = $formService->formDataTrick(
+            $trick,
+            $user,
+            $request
+        );
 
-        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
-            $completedForm = $request->request->all()['create_trick'];
-            $pictures = $request->files->all()['create_trick']['pictures'];
-
-            $formService->formDataTrick(
-                $trick,
-                $params,
-                $user,
-                $completedForm,
-                $pictures
-            );
-
+        if ($formTrick->isSubmitted()) {
             $offset = max(0, $request->query->getInt('offset', 0));
             $paginator = $trickRepository->getTricksPaginator($offset);
 
@@ -83,20 +74,13 @@ class TrickController extends AbstractController
     ): Response {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
 
-        $formTrick = $this->addForm($trick);
-        $formTrick->handleRequest($request);
+        $formTrick = $formService->formDataTrick(
+            $trick,
+            $user,
+            $request
+        );
 
-        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
-            $completedForm = $request->request->all()['create_trick'];
-            $pictures = $request->files->all()['create_trick']['pictures'];
-
-            $formService->formDataTrick(
-                $trick,
-                $params,
-                $user,
-                $completedForm,
-                $pictures
-            );
+        if ($formTrick->isSubmitted()) {
             $offset = max(0, $request->query->getInt('offset', 0));
             $paginator = $trickRepository->getTricksPaginator($offset);
 
@@ -112,13 +96,6 @@ class TrickController extends AbstractController
         }
     }
 
-    public function addForm(Trick $trick): FormInterface
-    {
-        $formTrick = $this->createForm(CreateTrickType::class, $trick);
-
-        return $formTrick;
-    }
-
     #[Route(path: '/trick/{id}', name: 'one_trick')]
     public function showOneTrick(
         int $id,
@@ -127,8 +104,6 @@ class TrickController extends AbstractController
         DateService $dateService,
         #[CurrentUser] ?User $user,
     ): Response {
-        $dateNow = $dateService->dateNow();
-
         $trick = $this->em->getRepository(Trick::class)->find($id);
         $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
         //Set->type pour différencier les videos des images
