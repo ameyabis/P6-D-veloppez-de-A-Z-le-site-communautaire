@@ -16,3 +16,9 @@ composer update
 
 ## Créez la base de données
 php bin/console doctrine:schema:create nom_de_la_base_de_données
+
+## Ajouter les champs dans les tables
+php bin/console doctrine:migrations:migrate
+
+## Ajout des données
+php bin/console doctrine:fixtures:load
