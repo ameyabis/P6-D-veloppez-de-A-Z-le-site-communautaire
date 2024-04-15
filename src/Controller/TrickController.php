@@ -13,6 +13,7 @@ use App\Service\FormService;
 use App\Form\CreateTrickType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -40,7 +41,7 @@ class TrickController extends AbstractController
     ): Response {
         $trick = new Trick();
 
-        $formTrick = $this->createForm(CreateTrickType::class, $trick);
+        $formTrick = $this->addForm($trick);
         $formTrick->handleRequest($request);
 
         if ($formTrick->isSubmitted() && $formTrick->isValid()) {
@@ -82,7 +83,7 @@ class TrickController extends AbstractController
     ): Response {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
 
-        $formTrick = $this->createForm(CreateTrickType::class, $trick);
+        $formTrick = $this->addForm($trick);
         $formTrick->handleRequest($request);
 
         if ($formTrick->isSubmitted() && $formTrick->isValid()) {
@@ -109,6 +110,13 @@ class TrickController extends AbstractController
                 'formTrick' => $formTrick,
             ]);
         }
+    }
+
+    public function addForm(Trick $trick): FormInterface
+    {
+        $formTrick = $this->createForm(CreateTrickType::class, $trick);
+
+        return $formTrick;
     }
 
     #[Route(path: '/trick/{id}', name: 'one_trick')]
