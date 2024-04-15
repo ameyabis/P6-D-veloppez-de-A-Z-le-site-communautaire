@@ -13,7 +13,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class FormService
 {
     public function __construct(
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private DateService $dateService,
     ){}
 
     public function formDataTrick(
@@ -23,10 +24,7 @@ class FormService
         array $completedForm,
         array $pictures
     ): Trick {
-        $dateNow = new \DateTime();
-        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
-        $dateNow->format('Y-m-d H:i:s');
-
+        $dateNow = $this->dateService->dateNow();
 
         $trick->setName($completedForm['name']);
         $trick->setGroupTrick($completedForm['groupTrick']);
