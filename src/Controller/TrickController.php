@@ -8,17 +8,18 @@ use App\Entity\Video;
 use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
+use App\Service\DateService;
+use App\Service\FormService;
 use App\Form\CreateTrickType;
 use App\Repository\TrickRepository;
-use App\Service\FormService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TrickController extends AbstractController
 {
@@ -46,7 +47,7 @@ class TrickController extends AbstractController
             $completedForm = $request->request->all()['create_trick'];
             $pictures = $request->files->all()['create_trick']['pictures'];
 
-            $formService->FormDataTrick(
+            $formService->formDataTrick(
                 $trick,
                 $params,
                 $user,
@@ -88,7 +89,7 @@ class TrickController extends AbstractController
             $completedForm = $request->request->all()['create_trick'];
             $pictures = $request->files->all()['create_trick']['pictures'];
 
-            $formService->FormDataTrick(
+            $formService->formDataTrick(
                 $trick,
                 $params,
                 $user,
@@ -114,11 +115,11 @@ class TrickController extends AbstractController
     public function showOneTrick(
         int $id,
         Request $request,
+        CommentController $commentController,
+        DateService $dateService,
         #[CurrentUser] ?User $user,
     ): Response {
-        $dateNow = new \DateTime();
-        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
-        $dateNow->format('Y-m-d H:i:s');
+        $dateNow = $dateService->dateNow();
 
         $trick = $this->em->getRepository(Trick::class)->find($id);
         $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
@@ -134,30 +135,13 @@ class TrickController extends AbstractController
 
         $attachments = array_merge($videos, $pictures);
 
-        $comment = new Comment();
-
-        $commentForm = $this->createForm(CommentType::class, $comment);
-        $commentForm->handleRequest($request);
-
-        if ($commentForm->isSubmitted() && $commentForm->isValid()) {
-            $completedForm = $request->request->all()['comment'];
-            $comment->setContent($completedForm['content']);
-            $comment->setUser($user);
-            $comment->setTrick($trick);
-            $comment->setDateCreate($dateNow);
-
-            $this->em->persist($comment);
-            $this->em->flush();
-
-            $commentForm = $this->createForm(CommentType::class, $comment);
-            $commentForm->get('content')->setData(null);
-        }
-
-        $comments = $this->em->getRepository(Comment::class)->findBy(
-            ['trick' => $id],
-            ['id' => 'DESC'],
-            5
+        $commentForm = $commentController->addComment(
+            $request,
+            $user,
+            $trick
         );
+
+        $comments = $commentController->getComment($id);
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
