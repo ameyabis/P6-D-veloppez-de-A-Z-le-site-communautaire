@@ -9,6 +9,8 @@ use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
 use App\Form\CreateTrickType;
+use App\Repository\TrickRepository;
+use App\Service\FormService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,22 +30,14 @@ class TrickController extends AbstractController
     //Fonction pour créer et modifier notre trick
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/formTrick', name: 'form_trick')]
-    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
     public function createFormTrick(
-        ?int $id,
         Request $request,
         ParameterBagInterface $params,
-    #[CurrentUser] ?User $user
+        FormService $formService,
+        TrickRepository $trickRepository,
+        #[CurrentUser] ?User $user
     ): Response {
-        if ($id === null) {
-            $trick = new Trick();
-        } else {
-            $trick = $this->em->getRepository(Trick::class)->find($id);
-        }
-
-        $dateNow = new \DateTime();
-        $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
-        $dateNow->format('Y-m-d H:i:s');
+        $trick = new Trick();
 
         $formTrick = $this->createForm(CreateTrickType::class, $trick);
         $formTrick->handleRequest($request);
@@ -52,41 +46,62 @@ class TrickController extends AbstractController
             $completedForm = $request->request->all()['create_trick'];
             $pictures = $request->files->all()['create_trick']['pictures'];
 
-            $trick->setName($completedForm['name']);
-            $trick->setGroupTrick($completedForm['groupTrick']);
-            $trick->setDescription($completedForm['description']);
-            $trick->setDateCreate($dateNow);
-            if ($id === null) {
-                $trick->setUser($user);
-            }
+            $formService->FormDataTrick(
+                $trick,
+                $params,
+                $user,
+                $completedForm,
+                $pictures
+            );
 
-            $this->em->persist($trick);
-
-            //Gestion des videos
-            foreach ($trick->getVideos() as $video) {
-                $video->setTrick($trick);
-
-                $this->em->persist($video);
-            }
-
-            //Gestion des images
-            foreach ($pictures as $pictureUpload) {
-                $extension = $pictureUpload->guessExtension();
-                $path = $params->get('images_directory');
-                $fichier = $pictureUpload->getFileName();
-
-                $picture = new Picture();
-                $picture->setUrl($fichier . '.' . $extension);
-                $picture->setTrick($trick);
-
-                $this->em->persist($picture);
-                $pictureUpload->move($path . '/', $fichier . '.' . $extension);
-            }
-
-            $this->em->flush();
+            $offset = max(0, $request->query->getInt('offset', 0));
+            $paginator = $trickRepository->getTricksPaginator($offset);
 
             return $this->render('home/homePage.html.twig', [
-                'tricks' => $this->getTricks()
+                'tricks' => $paginator,
+                'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
+                'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
+            ]);
+        } else {
+            return $this->render('crud/formTrick.html.twig', [
+                'formTrick' => $formTrick,
+            ]);
+        }
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
+    public function editTrick(
+        ?int $id,
+        Request $request,
+        ParameterBagInterface $params,
+        FormService $formService,
+        TrickRepository $trickRepository,
+        #[CurrentUser] ?User $user
+    ): Response {
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
+
+        $formTrick = $this->createForm(CreateTrickType::class, $trick);
+        $formTrick->handleRequest($request);
+
+        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
+            $completedForm = $request->request->all()['create_trick'];
+            $pictures = $request->files->all()['create_trick']['pictures'];
+
+            $formService->FormDataTrick(
+                $trick,
+                $params,
+                $user,
+                $completedForm,
+                $pictures
+            );
+            $offset = max(0, $request->query->getInt('offset', 0));
+            $paginator = $trickRepository->getTricksPaginator($offset);
+
+            return $this->render('home/homePage.html.twig', [
+                'tricks' => $paginator,
+                'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
+                'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
             ]);
         } else {
             return $this->render('crud/formTrick.html.twig', [
@@ -99,7 +114,7 @@ class TrickController extends AbstractController
     public function showOneTrick(
         int $id,
         Request $request,
-    #[CurrentUser] ?User $user,
+        #[CurrentUser] ?User $user,
     ): Response {
         $dateNow = new \DateTime();
         $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
@@ -160,12 +175,17 @@ class TrickController extends AbstractController
     }
 
     #[Route(path: '/tricks', name: 'all_tricks')]
-    public function showTricks(): Response
-    {
-        $tricks = $this->em->getRepository(Trick::class)->findAll();
+    public function showTricks(
+        Request $request,
+        TrickRepository $trickRepository
+    ): Response {
+        $offset = max(0, $request->query->getInt('offset', 0));
+        $paginator = $trickRepository->getTricksPaginator($offset);
 
         return $this->render('page/tricks.html.twig', [
-            'tricks' => $tricks,
+            'tricks' => $paginator,
+            'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
+            'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
         ]);
     }
 
