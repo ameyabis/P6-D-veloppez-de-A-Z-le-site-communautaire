@@ -46,7 +46,7 @@ class TrickController extends AbstractController
             $completedForm = $request->request->all()['create_trick'];
             $pictures = $request->files->all()['create_trick']['pictures'];
 
-            $formService->FormDataTrick(
+            $formService->formDataTrick(
                 $trick,
                 $params,
                 $user,
@@ -88,7 +88,7 @@ class TrickController extends AbstractController
             $completedForm = $request->request->all()['create_trick'];
             $pictures = $request->files->all()['create_trick']['pictures'];
 
-            $formService->FormDataTrick(
+            $formService->formDataTrick(
                 $trick,
                 $params,
                 $user,

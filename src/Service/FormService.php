@@ -16,7 +16,7 @@ class FormService
         private EntityManagerInterface $em
     ){}
 
-    public function FormDataTrick(
+    public function formDataTrick(
         Trick $trick,
         ParameterBagInterface $params,
         User $user,
