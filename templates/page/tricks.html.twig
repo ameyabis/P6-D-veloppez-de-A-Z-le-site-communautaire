@@ -30,13 +30,16 @@
             </a>
         </div>
         {% endfor %}
+    </div>
 
+    <div>
         {% if previous >= 0 %}
-            <a class="text-white text-decoration-none" href="{{ path('all_tricks', { offset: previous }) }}"><i class="fa-solid fa-square-caret-left fa-2xl"></i></a>
+        <a class="text-white text-decoration-none" href="{{ path('all_tricks', { offset: previous }) }}"><i
+                class="fa-solid fa-square-caret-left fa-2xl"></i></a>
         {% endif %}
-        {% if next < tricks|length %}
-            <a class="text-white text-decoration-none" href="{{ path('all_tricks', { offset: next }) }}"><i class="fa-solid fa-square-caret-right fa-2xl"></i></a>
-        {% endif %}
+        {% if next < tricks|length %} <a class="text-white text-decoration-none"
+            href="{{ path('all_tricks', { offset: next }) }}"><i class="fa-solid fa-square-caret-right fa-2xl"></i></a>
+            {% endif %}
     </div>
 </section>
 {% endblock %}
