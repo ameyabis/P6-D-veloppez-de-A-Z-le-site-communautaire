@@ -9,7 +9,7 @@ class DateService
     {
         $dateNow = new DateTime();
         $dateNow->setTimezone(new \DateTimeZone('Europe/Paris'));
-        $dateNow->format('Y-m-d H:i:s');
+        $dateNow->format('Ymd');
 
         return $dateNow;
     }
