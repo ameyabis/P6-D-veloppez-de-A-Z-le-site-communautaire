@@ -34,7 +34,7 @@ class CommentController extends AbstractController
 
     public function addComment(
         Request $request,
-        User $user,
+        ?User $user,
         Trick $trick
     ): FormInterface
     {
