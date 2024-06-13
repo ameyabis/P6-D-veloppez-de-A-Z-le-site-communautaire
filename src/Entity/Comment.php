@@ -21,7 +21,8 @@ class Comment
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Trick $trick = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
