@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\Video;
+use App\Entity\Groups;
 use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
@@ -31,40 +32,8 @@ class TrickController extends AbstractController
     //Fonction pour créer et modifier notre trick
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/formTrick', name: 'form_trick')]
+    #[Route(path: '/formTrick/{id}', name: 'form_edit')]
     public function createFormTrick(
-        Request $request,
-        ParameterBagInterface $params,
-        FormService $formService,
-        TrickRepository $trickRepository,
-        #[CurrentUser] ?User $user
-    ): Response {
-        $trick = new Trick();
-
-        $formTrick = $formService->formDataTrick(
-            $trick,
-            $user,
-            $request
-        );
-
-        if ($formTrick->isSubmitted()) {
-            $offset = max(0, $request->query->getInt('offset', 0));
-            $paginator = $trickRepository->getTricksPaginator($offset);
-
-            return $this->render('home/homePage.html.twig', [
-                'tricks' => $paginator,
-                'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
-                'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
-            ]);
-        } else {
-            return $this->render('crud/formTrick.html.twig', [
-                'formTrick' => $formTrick,
-            ]);
-        }
-    }
-
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route(path: '/editTrick/{id}', name: 'edit_trick')]
-    public function editTrick(
         ?int $id,
         Request $request,
         ParameterBagInterface $params,
@@ -72,28 +41,20 @@ class TrickController extends AbstractController
         TrickRepository $trickRepository,
         #[CurrentUser] ?User $user
     ): Response {
-        $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
+        if (!isset($id)) {
+            $trick = new Trick();
+        } else {
+            $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
+        }
 
-        $formTrick = $formService->formDataTrick(
+        $group = $this->em->getRepository(Groups::class) ->findAll();
+
+        return $formService->formDataTrick(
             $trick,
             $user,
-            $request
+            $request,
+            $group
         );
-
-        if ($formTrick->isSubmitted()) {
-            $offset = max(0, $request->query->getInt('offset', 0));
-            $paginator = $trickRepository->getTricksPaginator($offset);
-
-            return $this->render('home/homePage.html.twig', [
-                'tricks' => $paginator,
-                'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
-                'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
-            ]);
-        } else {
-            return $this->render('crud/formTrick.html.twig', [
-                'formTrick' => $formTrick,
-            ]);
-        }
     }
 
     #[Route(path: '/trick/{id}', name: 'one_trick')]
@@ -132,13 +93,6 @@ class TrickController extends AbstractController
             'comments' => $comments,
             'formComment' => $commentForm,
         ]);
-    }
-
-    public function getTricks(): array
-    {
-        $tricks = $this->em->getRepository(Trick::class)->findAll();
-
-        return $tricks;
     }
 
     #[Route(path: '/tricks', name: 'all_tricks')]

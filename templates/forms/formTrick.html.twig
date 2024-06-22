@@ -12,8 +12,13 @@
             </div>
 
             <div class="col-lg-5 mb-3">
-                {{ form_label(formTrick.groupTrick) }}
-                {{ form_widget(formTrick.groupTrick, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(formTrick.groups) }}
+                {{ form_widget(formTrick.groups, {'attr': {'class': 'form-control', 'list': 'datalist-id'}}) }}
+                <datalist id="datalist-id">
+                    {% for group in groups %}
+                    <option value="{{group.name}}"></option>
+                    {% endfor %}
+                </datalist>
             </div>
         </div>
 

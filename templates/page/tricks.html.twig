@@ -19,7 +19,7 @@
                         <h2 class="col-10">{{ trick.name }}</h2>
                     </a>
                     {% if app.user %}
-                    <a class="col-1 text-dark text-decoration-none" href="{{ path('edit_trick', {'id': trick.id}) }}">
+                    <a class="col-1 text-dark text-decoration-none" href="{{ path('form_edit', {'id': trick.id}) }}">
                         <i class="col-1 fa-solid fa-pen"></i>
                     </a>
                     <a class="col-1 text-dark text-decoration-none" href="{{ path('delete_trick', {'id': trick.id}) }}">

@@ -19,7 +19,7 @@ class CreateTrickType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('description', TextareaType::class)
-            ->add('groupTrick', TextType::class)
+            ->add('groups', TextType::class, ['mapped' => false])
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideoType::class,
                 'allow_add' => true,
