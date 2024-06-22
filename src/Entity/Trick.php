@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
 class Trick
@@ -16,14 +17,13 @@ class Trick
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $description = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $groupTrick = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateCreate = null;
@@ -42,6 +42,9 @@ class Trick
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
     private Collection $comments;
+
+    #[ORM\ManyToOne(inversedBy: 'trick')]
+    private ?Groups $groups = null;
 
     public function __construct()
     {
@@ -75,18 +78,6 @@ class Trick
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getGroupTrick(): ?string
-    {
-        return $this->groupTrick;
-    }
-
-    public function setGroupTrick(string $groupTrick): static
-    {
-        $this->groupTrick = $groupTrick;
 
         return $this;
     }
@@ -213,6 +204,18 @@ class Trick
                 $comment->setTrick(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGroups(): ?Groups
+    {
+        return $this->groups;
+    }
+
+    public function setGroups(?Groups $groups): static
+    {
+        $this->groups = $groups;
 
         return $this;
     }
