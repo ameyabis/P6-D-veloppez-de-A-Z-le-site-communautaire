@@ -2,8 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Groups;
 use App\Entity\Trick;
 use App\Form\VideoType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -19,7 +21,12 @@ class CreateTrickType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('description', TextareaType::class)
-            ->add('groups', TextType::class, ['mapped' => false])
+            ->add('groups', EntityType::class, [
+                'class' => Groups::class,
+                'choice_label' => function($groups){
+                    return $groups->getName();
+                }
+            ])
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideoType::class,
                 'allow_add' => true,
