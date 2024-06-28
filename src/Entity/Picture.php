@@ -16,7 +16,7 @@ class Picture
     #[ORM\Column(length: 500)]
     private ?string $url = null;
 
-    #[ORM\ManyToOne(inversedBy: 'pictures')]
+    #[ORM\ManyToOne(inversedBy: 'pictures', cascade: ['persist'])]
     private ?Trick $trick = null;
     private ?string $type = null;
 

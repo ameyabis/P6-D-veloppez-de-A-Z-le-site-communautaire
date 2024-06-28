@@ -24,8 +24,21 @@
 
         <ul class="videos px-0 col-6 d-flex flex-column justify-content-center"
             data-index="{{ formTrick.videos|length > 0 ? formTrick.videos|last.vars.name + 1 : 0 }}"
-            data-prototype="{{ form_widget(formTrick.videos.vars.prototype)|e('html_attr') }}"></ul>
-            
+            data-prototype="{{ form_widget(formTrick.videos.vars.prototype)|e('html_attr') }}">
+            <button type="button" class="add_item_link btn btn-primary" data-collection-holder-class="videos">Ajouter
+                une vidéo</button>
+        </ul>
+
+        <div class="d-flex flex-column">
+            {# {{ form_widget(formTrick.videos) }} #}
+            {% for video in formTrick.videos %}
+            <div class="d-flex justify-content-center">
+                {{ form_widget(video) }}
+                <button type="button" class="btn btn-light">X</button>
+            </div>
+            {% endfor %}
+        </div>
+
         <div class="mb-3">
             {{ form_row(formTrick.pictures) }}
         </div>
@@ -34,26 +47,19 @@
         <button type="submit" class="btn btn-primary col-6">Valider</button>
     </div>
     {{ form_end(formTrick) }}
+
+    {# {% for picture in pictures %}
+    <img src="{{ asset('assets/uploads/'~picture.url) }}" alt="">
+    {% endfor %} #}
 </div>
 <script>
-    const addVideoLink = document.createElement('a');
-    addVideoLink.classList.add('add_item_link', 'btn', 'btn-primary', 'm-0');
-    addVideoLink.href = '#';
-    addVideoLink.innerText = 'Ajouter une video';
-    addVideoLink.dataset.collectionHolderClass = 'videos';
+    document
+        .querySelectorAll('.add_item_link')
+        .forEach(btn => {
+            btn.addEventListener("click", addFormToCollection)
+        });
 
-    const newLinkLi = document.createElement('li');
-    newLinkLi.append(addVideoLink);
-
-    const collectionHolder = document.querySelector('ul.videos');
-    collectionHolder.appendChild(addVideoLink);
-
-    document.querySelectorAll('ul.tags li')
-        .forEach((video) => {
-            addTagFormDeleteLink(video);
-        })
-
-    const addFormToCollection = (e) => {
+    function addFormToCollection(e) {
         const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
 
         const item = document.createElement('li');
@@ -72,9 +78,7 @@
         collectionHolder.dataset.index++;
 
         addTagFormDeleteLink(item);
-    }
-
-    addVideoLink.addEventListener("click", addFormToCollection);
+    };
 
     const addTagFormDeleteLink = (item) => {
         const removeFormButton = document.createElement('button');

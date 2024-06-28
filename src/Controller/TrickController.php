@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\Video;
-use App\Entity\Groups;
 use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
@@ -32,47 +31,61 @@ class TrickController extends AbstractController
     //Fonction pour créer et modifier notre trick
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/formTrick', name: 'form_trick')]
-    #[Route(path: '/formTrick/{id}', name: 'form_edit')]
     public function createFormTrick(
-        ?int $id,
         Request $request,
         ParameterBagInterface $params,
         FormService $formService,
         TrickRepository $trickRepository,
         #[CurrentUser] ?User $user
     ): Response {
-        if (!isset($id)) {
-            $trick = new Trick();
-        } else {
-            $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
-        }
-
-        $group = $this->em->getRepository(Groups::class) ->findAll();
+        $trick = new Trick();
+        $pictures = [];
 
         return $formService->formDataTrick(
             $trick,
             $user,
             $request,
-            $group
+            $pictures
         );
     }
 
-    #[Route(path: '/trick/{id}', name: 'one_trick')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route(path: '/formTrick/{name}', name: 'form_edit')]
+    public function editFormTrick(
+        string $name,
+        Request $request,
+        ParameterBagInterface $params,
+        FormService $formService,
+        TrickRepository $trickRepository,
+        #[CurrentUser] ?User $user
+    ): Response {
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
+        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
+
+        return $formService->formDataTrick(
+            $trick,
+            $user,
+            $request,
+            $pictures
+        );
+    }
+
+    #[Route(path: '/trick/{name}', name: 'one_trick')]
     public function showOneTrick(
-        int $id,
+        string $name,
         Request $request,
         CommentController $commentController,
         DateService $dateService,
         #[CurrentUser] ?User $user,
     ): Response {
-        $trick = $this->em->getRepository(Trick::class)->find($id);
-        $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
+        $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $trick->getId()]);
         //Set->type pour différencier les videos des images
         foreach ($videos as $video) {
             $video->setType('video');
         }
 
-        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $id]);
+        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
         foreach ($pictures as $picture) {
             $picture->setType('picture');
         }
@@ -85,7 +98,7 @@ class TrickController extends AbstractController
             $trick
         );
 
-        $comments = $commentController->getComment($id);
+        $comments = $commentController->getComment($trick->getId());
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
@@ -111,13 +124,15 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route(path: '/deleteTrick/{id}', name: 'delete_trick')]
-    public function deleteTrick(int $id): Response
+    #[Route(path: '/deleteTrick/{name}', name: 'delete_trick')]
+    public function deleteTrick(string $name): Response
     {
-        $trick = $this->em->getRepository(Trick::class)->find($id);
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
 
         $this->em->remove($trick);
         $this->em->flush();
+
+        $this->addFlash('success', 'La figure a été correctement supprimé');
 
         return $this->redirectToRoute('app_home');
     }
