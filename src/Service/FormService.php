@@ -11,7 +11,6 @@ use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,7 +33,7 @@ class FormService extends AbstractController
         Request $request,
         ?array $picturesPath,
         Trick $trick = new Trick()
-    ) {
+    ): ?FormInterface {
         $originalVideos = new ArrayCollection();
 
         foreach ($trick->getVideos() as $video) {
@@ -96,9 +95,6 @@ class FormService extends AbstractController
             $this->em->flush();
 
             $this->addFlash('success', 'La figure a bien été enregistré.');
-
-            $offset = max(0, $request->query->getInt('offset', 0));
-            $paginator = $this->trickRepository->getTricksPaginator($offset);
         }
 
         return $formTrick;
