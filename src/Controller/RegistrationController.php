@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register')]
+    #[Route(path: '/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $userPasswordHasher,
@@ -72,8 +72,7 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/verify/{token}', name: 'verify_user')]
-
+    #[Route(path: '/verify/{token}', name: 'verify_user', methods: 'GET')]
     public function verifyUser(
         string $token,
         JwtService $jwt,
@@ -98,7 +97,7 @@ class RegistrationController extends AbstractController
         return $this->redirectToRoute('app_login');
     }
 
-    #[Route('/renvoiverif', name: 'resend_verif')]
+    #[Route(path: '/renvoiverif', name: 'resend_verif', methods: 'GET')]
     public function resendVerif(
         JwtService $jwt,
         SendMailService $sendMail,

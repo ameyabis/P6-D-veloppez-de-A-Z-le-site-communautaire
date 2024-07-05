@@ -19,14 +19,19 @@
         <h1>Tricks</h1>
         <div class="col d-flex flex-wrap justify-content-center">
             {% for trick in tricks %}
+            {% set pictureUrl = '' %}
+            {% if trick.pictures.0 is defined %}
+                {% set pictureUrl = 'assets/uploads/'~trick.pictures.0.url %}
+            {% else %}
+                {% for group in groups %}
+                    {% if group.id == trick.groups.id %}
+                        {% set pictureUrl = 'image/'~group.illustrationUrl %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             <div class="card col-12 col-lg-3 m-2">
                 <a href="{{ path('one_trick', {'name': trick.name}) }}" class="text-dark text-decoration-none">
-                    {% if trick.pictures.0 is defined %}
-                    <img src="{{ asset('assets/uploads/'~trick.pictures.0.url) }}" class="card-img-top" alt="...">
-                    {% else %}
-                    <img src="https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg"
-                        class="card-img-top" alt="...">
-                    {% endif %}
+                    <img src="{{ asset(pictureUrl) }}" class="card-img-top" alt="...">
                     <div class="col-12 d-flex align-items-center">
                         <a href="{{ path('one_trick', {'name': trick.name}) }}"
                             class="col-10 text-dark text-decoration-none">

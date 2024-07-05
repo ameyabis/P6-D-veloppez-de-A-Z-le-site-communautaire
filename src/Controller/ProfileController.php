@@ -22,7 +22,7 @@ class ProfileController extends AbstractController
     }
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route('/profile', name: 'profile')]
+    #[Route(path: '/profile', name: 'profile', methods: ['GET', 'POST'])]
     public function showProfile(
         #[CurrentUser] ?User $user,
         Request $request,

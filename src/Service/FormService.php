@@ -9,6 +9,7 @@ use App\Entity\Picture;
 use App\Form\CreateTrickType;
 use App\Repository\TrickRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,11 +30,11 @@ class FormService extends AbstractController
     }
 
     public function formDataTrick(
-        Trick $trick,
         User $user,
         Request $request,
-        ?array $picturesPath
-    ): ?Response {
+        ?array $picturesPath,
+        Trick $trick = new Trick()
+    ) {
         $originalVideos = new ArrayCollection();
 
         foreach ($trick->getVideos() as $video) {
@@ -51,20 +52,8 @@ class FormService extends AbstractController
 
             foreach ($originalVideos as $tag) {
                 if (false === $trick->getVideos()->contains($tag)) {
-                    $this->em->remove($tag);;
-
-                    // $this->em->persist($tag);
+                    $this->em->remove($tag);
                 }
-            }
-            // $this->em->persist($trick);
-
-            if ($this->em->getRepository(Trick::class)->findOneBy(['name' => $completedForm['name']]) && $trick->getId() === null) {
-                $this->addFlash('warning', 'Le nom de figure est déjà utilisé.');
-
-                return $this->render('forms/formTrick.html.twig', [
-                    'formTrick' => $formTrick,
-                    'groups' => $groups
-                ]);
             }
 
             foreach ($groups as $group) {
@@ -110,18 +99,8 @@ class FormService extends AbstractController
 
             $offset = max(0, $request->query->getInt('offset', 0));
             $paginator = $this->trickRepository->getTricksPaginator($offset);
-
-            return $this->render('home/homePage.html.twig', [
-                'tricks' => $paginator,
-                'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
-                'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
-            ]);
-        } else {
-            return $this->render('forms/formTrick.html.twig', [
-                'formTrick' => $formTrick,
-                'groups' => $groups,
-                'pictures' => $picturesPath,
-            ]);
         }
+
+        return $formTrick;
     }
 }
