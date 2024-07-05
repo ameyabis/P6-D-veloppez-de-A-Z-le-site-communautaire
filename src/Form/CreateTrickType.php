@@ -23,7 +23,7 @@ class CreateTrickType extends AbstractType
             ->add('description', TextareaType::class)
             ->add('groups', EntityType::class, [
                 'class' => Groups::class,
-                'choice_label' => function($groups){
+                'choice_label' => function(Groups $groups){
                     return $groups->getName();
                 }
             ])
