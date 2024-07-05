@@ -21,6 +21,9 @@ class Groups
     #[ORM\OneToMany(mappedBy: 'groups', targetEntity: Trick::class)]
     private Collection $trick;
 
+    #[ORM\Column(length: 255, nullable: false)]
+    private string $illustrationUrl;
+
     public function __construct()
     {
         $this->trick = new ArrayCollection();
@@ -69,6 +72,18 @@ class Groups
                 $trick->setGroups(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIllustrationUrl(): string
+    {
+        return $this->illustrationUrl;
+    }
+
+    public function setIllustrationUrl(string $illustrationUrl): static
+    {
+        $this->illustrationUrl = $illustrationUrl;
 
         return $this;
     }

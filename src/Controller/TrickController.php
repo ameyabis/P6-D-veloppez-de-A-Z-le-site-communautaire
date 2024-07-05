@@ -24,7 +24,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class TrickController extends AbstractController
 {
     public function __construct(
-        public EntityManagerInterface $em,
+        private EntityManagerInterface $em,
+        private FormService $formService,
     ) {
     }
 
@@ -33,15 +34,13 @@ class TrickController extends AbstractController
     #[Route(path: '/formTrick', name: 'form_trick')]
     public function createFormTrick(
         Request $request,
-        ParameterBagInterface $params,
-        FormService $formService,
         TrickRepository $trickRepository,
         #[CurrentUser] ?User $user
     ): Response {
         $trick = new Trick();
         $pictures = [];
 
-        return $formService->formDataTrick(
+        return $this->formService->formDataTrick(
             $trick,
             $user,
             $request,
@@ -54,15 +53,12 @@ class TrickController extends AbstractController
     public function editFormTrick(
         string $name,
         Request $request,
-        ParameterBagInterface $params,
-        FormService $formService,
-        TrickRepository $trickRepository,
         #[CurrentUser] ?User $user
     ): Response {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
         $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
 
-        return $formService->formDataTrick(
+        return $this->formService->formDataTrick(
             $trick,
             $user,
             $request,
@@ -80,17 +76,13 @@ class TrickController extends AbstractController
     ): Response {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
         $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $trick->getId()]);
-        //Set->type pour différencier les videos des images
-        foreach ($videos as $video) {
-            $video->setType('video');
-        }
 
         $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
-        foreach ($pictures as $picture) {
-            $picture->setType('picture');
-        }
+        $mainPicture = 'image/' . $trick->getGroups()->getIllustrationUrl();
 
-        $attachments = array_merge($videos, $pictures);
+        if (count($pictures) > 0) {
+            $mainPicture = 'assets/uploads/' . $pictures[0]->getUrl();
+        }
 
         $commentForm = $commentController->addComment(
             $request,
@@ -102,9 +94,11 @@ class TrickController extends AbstractController
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
-            'attachments' => $attachments,
+            'videos' => $videos,
+            'pictures' => $pictures,
             'comments' => $comments,
             'formComment' => $commentForm,
+            'mainPicture' => $mainPicture
         ]);
     }
 
@@ -135,5 +129,23 @@ class TrickController extends AbstractController
         $this->addFlash('success', 'La figure a été correctement supprimé');
 
         return $this->redirectToRoute('app_home');
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route(path: '/deletePicture/{url}', name: 'delete_one_picture')]
+    public function deletePictureFromTrick(
+        string $url,
+        #[CurrentUser] ?User $user
+    ): Response {
+        $picture = $this->em->getRepository(Picture::class)->findOneBy(['url' => $url]);
+        $trickName = $picture->getTrick()->getName();
+        $this->em->remove($picture);
+        $this->em->flush();
+
+        unlink($this->getParameter('kernel.project_dir') . '/public/assets/uploads/' . $url);
+
+        $this->addFlash('success', 'La photo a été supprimé avec succes.');
+
+        return $this->redirectToRoute('form_edit', ['name' => $trickName]);
     }
 }
