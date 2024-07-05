@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\Video;
+use App\Entity\Groups;
 use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
@@ -45,20 +46,19 @@ class TrickController extends AbstractController
             $pictures
         );
 
-        if ($formService['form']->isSubmitted()) {
-            // if ($this->em->getRepository(Trick::class)->findOneBy(['name' => $completedForm['name']]) && $trick->getId() === null) {
-            //     $this->addFlash('warning', 'Le nom de figure est déjà utilisé.');
+        if ($formService->isSubmitted()) {
+            if ($this->em->getRepository(Trick::class)->findOneBy(['name' => $formService->getData()->getName()]) && $formService->getData()->getId() === null) {
+                $this->addFlash('warning', 'Le nom de figure est déjà utilisé.');
 
-            //     return $this->render('forms/formTrick.html.twig', [
-            //         'formTrick' => $formTrick,
-            //         'groups' => $groups
-            //     ]);
-            // }
+                return $this->render('forms/formTrick.html.twig', [
+                    'formTrick' => $formService,
+                ]);
+            }
             return $this->redirectToRoute('one_trick', ['name' => $request->request->all()['create_trick']['name']]);
         }
 
         return $this->render('forms/formTrick.html.twig', [
-            'formTrick' => $formService['form'],
+            'formTrick' => $formService,
             'pictures' => $pictures
         ]);
     }
@@ -72,7 +72,7 @@ class TrickController extends AbstractController
     ): Response {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
         $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
-        // dd($trick);
+
         $formService = $this->formService->formDataTrick(
             $user,
             $request,
@@ -90,7 +90,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/trick/{name}', name: 'one_trick', methods: 'GET')]
+    #[Route(path: '/trick/{name}', name: 'one_trick', methods: ['GET', 'POST'])]
     public function showOneTrick(
         string $name,
         Request $request,
@@ -134,15 +134,18 @@ class TrickController extends AbstractController
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $trickRepository->getTricksPaginator($offset);
 
+        $groups = $this->em->getRepository(Groups::class)->findAll();
+
         return $this->render('page/tricks.html.twig', [
             'tricks' => $paginator,
             'previous' => $offset - TrickRepository::PAGINATOR_PER_PAGE,
-            'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE)
+            'next' => min(count($paginator), $offset + TrickRepository::PAGINATOR_PER_PAGE),
+            'groups' => $groups,
         ]);
     }
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route(path: '/delete-trick/{name}', name: 'delete_trick', methods: 'GET')]
+    #[Route(path: '/delete-trick/{name}', name: 'delete_trick', methods: ['GET'])]
     public function deleteTrick(string $name): Response
     {
         $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);

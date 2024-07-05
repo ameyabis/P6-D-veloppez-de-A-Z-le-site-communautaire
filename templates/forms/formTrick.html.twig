@@ -43,9 +43,6 @@
             <div class="col-2">
                 <img class="col-10" src="{{ asset('assets/uploads/'~picture.url) }}" alt="">
                 <div class="d-flex col-10 justify-content-end">
-                    <a class="text-white text-decoration-none mx-1" href="">
-                        <i class="fa-solid fa-pen"></i>
-                    </a>
                     <a class="text-white text-decoration-none mx-1" href="{{ path('delete_one_picture', { 'url': picture.url}) }}">
                         <i class="fa-solid fa-trash"></i>
                     </a>

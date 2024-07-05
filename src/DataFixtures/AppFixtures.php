@@ -34,12 +34,30 @@ class AppFixtures extends Fixture
         $manager->persist($user);
 
         $groups = [
-            'Les grabs',
-            'Les rotations',
-            'Les flips',
-            'Les rotations désaxées',
-            'Les slides',
-            'Les one foot tricks',
+            [
+                'name' => 'Les grabs',
+                'illustration_url' => 'indy_grab.png',
+            ],
+            [
+                'name' => 'Les rotations',
+                'illustration_url' => '360.jpg',
+            ],
+            [
+                'name' => 'Les flips',
+                'illustration_url' => 'flip.jpg',
+            ],
+            [
+                'name' => 'Les rotations désaxées',
+                'illustration_url' => 'rotation_desax.jpg',
+            ],
+            [
+                'name' => 'Les slides',
+                'illustration_url' => 'slide.webp',
+            ],
+            [
+                'name' => 'Les one foot tricks',
+                'illustration_url' => 'onefoottrick.jpg',
+            ],
         ];
 
         $tricks = [
@@ -98,7 +116,8 @@ class AppFixtures extends Fixture
 
         foreach ($groups as $groupTrick) {
             $group = new Groups();
-            $group->setName($groupTrick);
+            $group->setName($groupTrick['name']);
+            $group->setIllustrationUrl($groupTrick['illustration_url']);
             foreach ($tricks as $trick) {
                 if ($group->getName() === $trick['group']) {
                     $addTrick = new Trick;
