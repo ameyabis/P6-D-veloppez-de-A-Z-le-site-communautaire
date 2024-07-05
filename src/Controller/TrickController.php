@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Trick;
 use App\Entity\Video;
-use App\Entity\Groups;
 use App\Entity\Comment;
 use App\Entity\Picture;
 use App\Form\CommentType;
@@ -25,59 +24,65 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class TrickController extends AbstractController
 {
     public function __construct(
-        public EntityManagerInterface $em,
+        private EntityManagerInterface $em,
+        private FormService $formService,
     ) {
     }
 
     //Fonction pour créer et modifier notre trick
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     #[Route(path: '/formTrick', name: 'form_trick')]
-    #[Route(path: '/formTrick/{id}', name: 'form_edit')]
     public function createFormTrick(
-        ?int $id,
         Request $request,
-        ParameterBagInterface $params,
-        FormService $formService,
         TrickRepository $trickRepository,
         #[CurrentUser] ?User $user
     ): Response {
-        if (!isset($id)) {
-            $trick = new Trick();
-        } else {
-            $trick = $this->em->getRepository(Trick::class)->findOneBy(['id' => $id]);
-        }
+        $trick = new Trick();
+        $pictures = [];
 
-        $group = $this->em->getRepository(Groups::class) ->findAll();
-
-        return $formService->formDataTrick(
+        return $this->formService->formDataTrick(
             $trick,
             $user,
             $request,
-            $group
+            $pictures
         );
     }
 
-    #[Route(path: '/trick/{id}', name: 'one_trick')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route(path: '/formTrick/{name}', name: 'form_edit')]
+    public function editFormTrick(
+        string $name,
+        Request $request,
+        #[CurrentUser] ?User $user
+    ): Response {
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
+        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
+
+        return $this->formService->formDataTrick(
+            $trick,
+            $user,
+            $request,
+            $pictures
+        );
+    }
+
+    #[Route(path: '/trick/{name}', name: 'one_trick')]
     public function showOneTrick(
-        int $id,
+        string $name,
         Request $request,
         CommentController $commentController,
         DateService $dateService,
         #[CurrentUser] ?User $user,
     ): Response {
-        $trick = $this->em->getRepository(Trick::class)->find($id);
-        $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $id]);
-        //Set->type pour différencier les videos des images
-        foreach ($videos as $video) {
-            $video->setType('video');
-        }
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
+        $videos = $this->em->getRepository(Video::class)->findBy(['trick' => $trick->getId()]);
 
-        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $id]);
-        foreach ($pictures as $picture) {
-            $picture->setType('picture');
-        }
+        $pictures = $this->em->getRepository(Picture::class)->findBy(['trick' => $trick->getId()]);
+        $mainPicture = 'image/' . $trick->getGroups()->getIllustrationUrl();
 
-        $attachments = array_merge($videos, $pictures);
+        if (count($pictures) > 0) {
+            $mainPicture = 'assets/uploads/' . $pictures[0]->getUrl();
+        }
 
         $commentForm = $commentController->addComment(
             $request,
@@ -85,13 +90,15 @@ class TrickController extends AbstractController
             $trick
         );
 
-        $comments = $commentController->getComment($id);
+        $comments = $commentController->getComment($trick->getId());
 
         return $this->render('page/trick.html.twig', [
             'trick' => $trick,
-            'attachments' => $attachments,
+            'videos' => $videos,
+            'pictures' => $pictures,
             'comments' => $comments,
             'formComment' => $commentForm,
+            'mainPicture' => $mainPicture
         ]);
     }
 
@@ -111,14 +118,34 @@ class TrickController extends AbstractController
     }
 
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    #[Route(path: '/deleteTrick/{id}', name: 'delete_trick')]
-    public function deleteTrick(int $id): Response
+    #[Route(path: '/deleteTrick/{name}', name: 'delete_trick')]
+    public function deleteTrick(string $name): Response
     {
-        $trick = $this->em->getRepository(Trick::class)->find($id);
+        $trick = $this->em->getRepository(Trick::class)->findOneBy(['name' => $name]);
 
         $this->em->remove($trick);
         $this->em->flush();
 
+        $this->addFlash('success', 'La figure a été correctement supprimé');
+
         return $this->redirectToRoute('app_home');
+    }
+
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route(path: '/deletePicture/{url}', name: 'delete_one_picture')]
+    public function deletePictureFromTrick(
+        string $url,
+        #[CurrentUser] ?User $user
+    ): Response {
+        $picture = $this->em->getRepository(Picture::class)->findOneBy(['url' => $url]);
+        $trickName = $picture->getTrick()->getName();
+        $this->em->remove($picture);
+        $this->em->flush();
+
+        unlink($this->getParameter('kernel.project_dir') . '/public/assets/uploads/' . $url);
+
+        $this->addFlash('success', 'La photo a été supprimé avec succes.');
+
+        return $this->redirectToRoute('form_edit', ['name' => $trickName]);
     }
 }

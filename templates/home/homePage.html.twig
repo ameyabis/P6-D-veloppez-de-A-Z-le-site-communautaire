@@ -4,8 +4,7 @@
 
 {% block body %}
 <div class="container-fluid p-0">
-    <section class="vh-100 d-flex flex-column align-items-center"
-        style="background-image: url(https://i.pinimg.com/originals/7d/60/a1/7d60a164b6462c6edebad8e61117ea61.jpg); background-position: center;">
+    <section class="bg-header-homepage vh-100 d-flex flex-column align-items-center">
         <div class="d-flex h-100 flex-column justify-content-center align-items-center text-white">
             <h1>Bienvenue sur SnowTricks !</h1>
             <span>N'éhistez pas à partager & discuter avec tout le monde.</span>
@@ -21,7 +20,7 @@
         <div class="col d-flex flex-wrap justify-content-center">
             {% for trick in tricks %}
             <div class="card col-12 col-lg-3 m-2">
-                <a href="{{ path('one_trick', {'id': trick.id}) }}" class="text-dark text-decoration-none">
+                <a href="{{ path('one_trick', {'name': trick.name}) }}" class="text-dark text-decoration-none">
                     {% if trick.pictures.0 is defined %}
                     <img src="{{ asset('assets/uploads/'~trick.pictures.0.url) }}" class="card-img-top" alt="...">
                     {% else %}
@@ -29,17 +28,17 @@
                         class="card-img-top" alt="...">
                     {% endif %}
                     <div class="col-12 d-flex align-items-center">
-                        <a href="{{ path('one_trick', {'id': trick.id}) }}"
+                        <a href="{{ path('one_trick', {'name': trick.name}) }}"
                             class="col-10 text-dark text-decoration-none">
                             <h2 class="col-10">{{ trick.name }}</h2>
                         </a>
                         {% if app.user %}
                         <a class="col-1 text-dark text-decoration-none"
-                            href="{{ path('form_edit', {'id': trick.id}) }}">
+                            href="{{ path('form_edit', {'name': trick.name}) }}">
                             <i class="col-1 fa-solid fa-pen"></i>
                         </a>
                         <a class="col-1 text-dark text-decoration-none"
-                            href="{{ path('delete_trick', {'id': trick.id}) }}">
+                            href="{{ path('delete_trick', {'name': trick.name}) }}">
                             <i class="fa-solid fa-trash"></i>
                         </a>
                         {% endif %}

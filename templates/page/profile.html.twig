@@ -32,8 +32,7 @@
                                 <div class="d-lg-flex flex-column align-items-center d-none">
                                     <p>Image de profile</p>
                                     {% if picture != NULL %}
-                                    <img style="width: 200px; height: 200px; background-position: center;"
-                                        src="{{ asset('assets/uploads/'~picture) }}" alt="">
+                                    <img class="profil-picture" src="{{ asset('assets/uploads/'~picture) }}" alt="">
                                     {% endif %}
                                 </div>
                             </div>

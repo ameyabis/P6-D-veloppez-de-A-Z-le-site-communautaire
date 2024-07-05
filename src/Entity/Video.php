@@ -16,7 +16,7 @@ class Video
     #[ORM\Column(length: 500)]
     private ?string $url = null;
 
-    #[ORM\ManyToOne(inversedBy: 'videos')]
+    #[ORM\ManyToOne(inversedBy: 'videos', cascade: ['persist'])]
     private ?Trick $trick = null;
     private ?string $type = null;
 
